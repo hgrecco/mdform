@@ -1,4 +1,4 @@
 include AUTHORS CHANGES LICENSE README.rst BADGES.rst version.py
-recursive-include markdown_form *.py
+recursive-include mdform *.py
 exclude pull_request_template.md version.py .coveragerc
 global-exclude *.pyc *~ .DS_Store *__pycache__* *.pyo
