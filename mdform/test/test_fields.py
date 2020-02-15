@@ -1,4 +1,11 @@
-from mdform.extension import EmailField, Field, RadioField, SelectField, StringField
+from mdform.fields import (
+    EmailField,
+    Field,
+    FileField,
+    RadioField,
+    SelectField,
+    StringField,
+)
 
 
 def test_label():
@@ -46,4 +53,18 @@ def test_select_field():
     )
     assert SelectField.match("{ A->J, B, (C->P)}") == dict(
         items=(("A", "J"), ("B", "B"), ("C", "P")), default="C"
+    )
+
+
+def test_filefield():
+    assert FileField.match("...") == dict(allowed=None, description=None)
+    assert FileField.match("...[png]") == dict(allowed=("png",), description=None)
+    assert FileField.match("...[png,jpg]") == dict(
+        allowed=("png", "jpg"), description=None
+    )
+    assert FileField.match("...[png;image files only]") == dict(
+        allowed=("png",), description="image files only"
+    )
+    assert FileField.match("...[png,jpg;image files only]") == dict(
+        allowed=("png", "jpg"), description="image files only"
     )

@@ -21,10 +21,10 @@
 
 
 mdform
-=============
+======
 
 An extension for `python-markdown`_ to generate parse a form in Markdown
-based document. The syntax is strongly based on this wmd_ fork.
+based document.
 
 This document:
 
@@ -95,6 +95,8 @@ Usage
 Syntax
 ------
 
+The syntax is strongly based on this wmd_ fork.
+
 Text fields
 ~~~~~~~~~~~
 
@@ -149,6 +151,30 @@ Or with user-friendly labels:
     city = {BOS, SFO, (NYC -> New York City)}
 
 The option in parenthesis will be the default.
+
+
+File Field
+~~~~~~~~~~
+
+.. code-block::
+
+    name = ...
+
+or:
+
+.. code-block::
+
+    name = ...[png]
+
+
+.. code-block::
+
+    name = ...[png,jpg]
+
+
+.. code-block::
+
+    name = ...[png,jpg;Only image files]
 
 
 Required fields
