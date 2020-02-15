@@ -1,0 +1,49 @@
+from mdform.extension import EmailField, Field, RadioField, SelectField, StringField
+
+
+def test_label():
+    assert Field.match("name = @") == ("name", dict(type="EmailField", required=False))
+    assert Field.match("name* = @") == ("name", dict(type="EmailField", required=True))
+    assert Field.match("name * = @") == ("name", dict(type="EmailField", required=True))
+
+
+def test_string_field():
+    assert StringField.match("_") is None
+    assert StringField.match("__") is None
+    assert StringField.match("____") is None
+    assert StringField.match("___") == dict(length=None)
+    assert StringField.match("___[30]") == dict(length=30)
+    assert StringField.match(" ___[30]") == dict(length=30)
+    assert StringField.match("___[30] ") == dict(length=30)
+    assert StringField.match(" ___[30] ") == dict(length=30)
+    assert StringField.match("___[]") == dict(length=None)
+
+
+def test_email_field():
+    assert EmailField.match("") is None
+    assert EmailField.match("@") == dict()
+    assert EmailField.match(" @") == dict()
+    assert EmailField.match(" @ ") == dict()
+
+
+def test_radio_field():
+    assert RadioField.match("() A () B ()") == dict(items=("A", "B", ""), default=None)
+    assert RadioField.match("() A (x) B () C") == dict(
+        items=("A", "B", "C"), default="B"
+    )
+    assert RadioField.match("() A () B () C") == dict(
+        items=("A", "B", "C"), default=None
+    )
+
+
+def test_select_field():
+    assert SelectField.match("{ A, B, C") is None
+    assert SelectField.match("{ A, B, C}") == dict(
+        items=(("A", "A"), ("B", "B"), ("C", "C")), default=None
+    )
+    assert SelectField.match("{ A, B, (C)}") == dict(
+        items=(("A", "A"), ("B", "B"), ("C", "C")), default="C"
+    )
+    assert SelectField.match("{ A->J, B, (C->P)}") == dict(
+        items=(("A", "J"), ("B", "B"), ("C", "P")), default="C"
+    )
