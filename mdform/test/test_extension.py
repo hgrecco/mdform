@@ -1,6 +1,5 @@
-
-
 from markdown import Markdown
+
 from ..extension import FormExtension
 
 TEXT = """
@@ -21,11 +20,18 @@ JINJA = """<p>Welcome to the form tester</p>
 <p>{{ form.user_name }}</p>"""
 
 FORM = {
-    'name': dict(label='name', type='StringField', required=True, length=30),
-    'e_mail': dict(label='e-mail', type='EmailField', required=True),
-    'really_annoying_323_name': dict(label='really annoying 323 name', type='FileField', required=False, allowed=None, description=None),
-    'user_name': dict(label='name', type='StringField', required=True, length=None),
+    "name": dict(label="name", type="StringField", required=True, length=30),
+    "e_mail": dict(label="e-mail", type="EmailField", required=True),
+    "really_annoying_323_name": dict(
+        label="really annoying 323 name",
+        type="FileField",
+        required=False,
+        allowed=None,
+        description=None,
+    ),
+    "user_name": dict(label="name", type="StringField", required=True, length=None),
 }
+
 
 def test_default():
     md = Markdown(extensions=[FormExtension()])

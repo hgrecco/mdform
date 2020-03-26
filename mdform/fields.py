@@ -11,6 +11,7 @@ SECTION_RE = re.compile(r"\[section[ \t]*:(?P<name>.*)\]", re.UNICODE)
 COLLAPSE_OPEN_RE = re.compile(r"\[collapse[ \t]*:(?P<name>.*)\]", re.UNICODE)
 COLLAPSE_CLOSE_RE = re.compile(r"\[endcollapse]")
 
+
 class Common:
     @classmethod
     def match(cls, line):
@@ -122,7 +123,9 @@ class RadioField(Common):
 
     REGEX = r"[ \t]*(?P<content>\(x?\)[ \t]*[\w \t\-]+[\(\)\w \t\-]*)" + EOL
 
-    SUBREGEX = re.compile(r"\((?P<is_default>x?)\)[ \t]*(?P<label>[a-zA-Z0-9 \t_\-]?)", re.UNICODE)
+    SUBREGEX = re.compile(
+        r"\((?P<is_default>x?)\)[ \t]*(?P<label>[a-zA-Z0-9 \t_\-]?)", re.UNICODE
+    )
 
     @classmethod
     def process(cls, m):
@@ -177,22 +180,22 @@ class SelectField(Common):
             else:
                 pair = (item, item)
 
-            if '[c]' in pair[0]:
+            if "[c]" in pair[0]:
                 # collapse
                 if collapse_on is not None:
-                    raise ValueError('Can only collapse on a single item.')
+                    raise ValueError("Can only collapse on a single item.")
                 item0 = pair[0].replace("[c]", "")
                 item1 = pair[1].replace("[c]", "")
                 collapse_on = item0
                 pair = (item0, item1)
 
-            if '[o]' in pair[0]:
+            if "[o]" in pair[0]:
                 # open
                 if collapse_on is not None:
-                    raise ValueError('Can only collapse on a single item.')
+                    raise ValueError("Can only collapse on a single item.")
                 item0 = pair[0].replace("[o]", "")
                 item1 = pair[1].replace("[o]", "")
-                collapse_on = '~' + item0
+                collapse_on = "~" + item0
                 pair = (item0, item1)
 
             items.append(pair)

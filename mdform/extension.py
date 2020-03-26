@@ -1,15 +1,13 @@
-
 import re
 
 import unidecode
-
 from markdown.extensions import Extension
 from markdown.preprocessors import Preprocessor
 
-from .fields import COLLAPSE_OPEN_RE, COLLAPSE_CLOSE_RE, SECTION_RE, Field
+from .fields import COLLAPSE_CLOSE_RE, COLLAPSE_OPEN_RE, SECTION_RE, Field
 
 COLLAPSE_OPEN_HTML = r'<div id="accordion-%s">'
-COLLAPSE_CLOSE_HTML = r'</div>'
+COLLAPSE_CLOSE_HTML = r"</div>"
 
 
 def _sanitizer(s):
@@ -17,10 +15,10 @@ def _sanitizer(s):
     s = unidecode.unidecode(s)
 
     # Remove invalid characters
-    s = re.sub(r'[^0-9a-zA-Z_]', '_', s)
+    s = re.sub(r"[^0-9a-zA-Z_]", "_", s)
 
     # Remove leading characters until we find a letter or underscore
-    s = re.sub(r'^[^a-zA-Z_]+', '_', s)
+    s = re.sub(r"^[^a-zA-Z_]+", "_", s)
 
     return s
 
@@ -66,7 +64,7 @@ class FormPreprocessor(Preprocessor):
                 label, value = label_value
 
                 nolabel = False
-                if label.startswith('_'):
+                if label.startswith("_"):
                     label = label[1:]
                     nolabel = True
 
@@ -81,28 +79,31 @@ class FormPreprocessor(Preprocessor):
                     args = ["form.%s" % variable_name]
                     args.append("form_type='horizontal'")
 
-                    tag_class = ["form-control" ]
+                    tag_class = ["form-control"]
                     if nolabel:
                         tag_class.append("nolabel")
 
-                    collapse_on = value.get('collapse_on')
+                    collapse_on = value.get("collapse_on")
                     if collapse_on:
-                        comparator = '!=='
-                        if collapse_on.startswith('~'):
+                        comparator = "!=="
+                        if collapse_on.startswith("~"):
                             collapse_on = collapse_on[1:]
-                            comparator = '==='
+                            comparator = "==="
                         else:
-                            comparator = '!=='
+                            comparator = "!=="
 
                         tag_class.append("collapser")
-                        args.append(""" onchange="jQuery('#accordion-%s').toggle(jQuery(this).val() %s '%s');" """ % (variable_name, comparator, collapse_on))
+                        args.append(
+                            """ onchange="jQuery('#accordion-%s').toggle(jQuery(this).val() %s '%s');" """
+                            % (variable_name, comparator, collapse_on)
+                        )
 
-                    args.append('class="%s"' % ' '.join("%s" % c for c in tag_class))
+                    args.append('class="%s"' % " ".join("%s" % c for c in tag_class))
 
-                    if value.get('length') is not None:
-                        args.append('maxlength=%d' % value['length'])
+                    if value.get("length") is not None:
+                        args.append("maxlength=%d" % value["length"])
 
-                    out.append("{{ wtf.form_field(%s) }}" % (', '.join(args)))
+                    out.append("{{ wtf.form_field(%s) }}" % (", ".join(args)))
                 else:
                     out.append("{{ form.%s }}" % variable_name)
             else:
@@ -116,14 +117,20 @@ class FormExtension(Extension):
     """ Form extension for Python-Markdown. """
 
     def __init__(self, **kwargs):
-        self.config = {'sanitizer': [_sanitizer, 'Function to sanitize the label'],
-                       'wtf': [False, 'Use wtf template for fields']}
+        self.config = {
+            "sanitizer": [_sanitizer, "Function to sanitize the label"],
+            "wtf": [False, "Use wtf template for fields"],
+        }
         super().__init__(**kwargs)
 
     def extendMarkdown(self, md):
         md.registerExtension(self)
         self.md = md
-        md.preprocessors.register(FormPreprocessor(md, self.getConfig('sanitizer'), self.getConfig('wtf')), "form", 30)
+        md.preprocessors.register(
+            FormPreprocessor(md, self.getConfig("sanitizer"), self.getConfig("wtf")),
+            "form",
+            30,
+        )
 
     def reset(self):
         self.md.Form = {}
