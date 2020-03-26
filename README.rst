@@ -113,6 +113,22 @@ or:
 Exactly 3 underscores will be matched. Any more will be handled as standard underline directives.
 
 
+Text area
+~~~~~~~~~
+
+.. code-block::
+
+    name = |||
+
+or:
+
+.. code-block::
+
+    name = |||[50]
+
+Exactly 3 slashes will be matched.
+
+
 Radio buttons
 ~~~~~~~~~~~~~
 
@@ -220,6 +236,27 @@ and:
                      'length': None
                      }
     }
+
+
+Collapsable parts
+~~~~~~~~~~~~~~~~~
+
+In certain cases is useful to create a part of the form which collapses based
+on the value of a dropdown box. Just use the modifier `[c]` for the dropdown item
+that will collapse the part of the html and enclose the collapsable part as
+shown:
+
+.. code-block::
+
+    extra = {Yes, (No[c])}
+
+    [collapse:extra]
+
+    name = ___
+
+    [endcollapse]
+
+The `extra` in the `collapse` tag indicates which dropdown box is used as control.
 
 
 See AUTHORS_ for a list of the maintainers.
