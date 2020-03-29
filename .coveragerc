@@ -1,0 +1,4 @@
+[run]
+source = mdform
+omit = mdform/test/*
+
