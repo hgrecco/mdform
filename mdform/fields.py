@@ -1,20 +1,68 @@
+"""
+    mdform.fields
+    ~~~~~~~~~~~~~
+
+    Fields:
+        - StringField           ___[length]     (length is optional)
+        - TextAreaField         AAA[length]     (length is optional)
+        - DateField             d/m/y
+        - TimeField             hh:mm
+        - EmailField            @
+        - RadioField            (x) A () B      (the x is optional
+        - CheckboxField         [x] A [] B      (the x is optional)
+        - SelectField           {(A), B}        (the parenthesis are optiona)
+        - FileField             ...[allowed]    (allowed is optional, extensions; description)
+
+    Organization:
+        - Section
+            [section:name]      name is a string which is prepended to the field names
+        - Collapsable part      control is the name of the field controlling open and close
+            [collapse:control]      of this part.
+            [endcollapse]           - Use [o] to indicate that selecting that option should open the part
+                                    - Use [c] to indicate that selecting that option should close the part
+
+    :copyright: 2020 by mdform Authors, see AUTHORS for more details.
+    :license: BSD, see LICENSE for more details.
+"""
+
 import re
 
+#: End of line with spaces or tabs before.
+EOL = r"[ \t]?$"
 
-def compile_regex(cls):
+#: Section definition.
+SECTION_RE = re.compile(r"\[section[ \t]*:(?P<name>.*)\]", re.UNICODE)
+
+#: Open of collapsable part.
+COLLAPSE_OPEN_RE = re.compile(r"\[collapse[ \t]*:(?P<name>.*)\]", re.UNICODE)
+
+#: Close of collapsable part.
+COLLAPSE_CLOSE_RE = re.compile(r"\[endcollapse]")
+
+
+def _compile_regex(cls):
     cls.REGEX = re.compile(cls.REGEX, re.UNICODE)
     return cls
 
 
-EOL = r"[ \t]?$"
-SECTION_RE = re.compile(r"\[section[ \t]*:(?P<name>.*)\]", re.UNICODE)
-COLLAPSE_OPEN_RE = re.compile(r"\[collapse[ \t]*:(?P<name>.*)\]", re.UNICODE)
-COLLAPSE_CLOSE_RE = re.compile(r"\[endcollapse]")
+class SpecificField:
+    """"Base clase for all specific fields.
+    """
 
-
-class Common:
     @classmethod
     def match(cls, line):
+        """Try to match the pattern to the provided line.
+
+        Parameters
+        ----------
+        line : str
+            The line to be parsed.
+        Returns
+        -------
+        None or dict
+            None indicates that the line was not matched.
+        """
+
         m = cls.REGEX.match(line)
         if not m:
             return None
@@ -22,8 +70,23 @@ class Common:
         return cls.process(m)
 
 
-@compile_regex
+@_compile_regex
 class Field:
+    """A field of any kind with label.
+
+    Used as an entry point, it match the label and then test all registered specific fields.
+
+    The format for optional fields is:
+
+        label = <pending>
+
+    and for required fields is:
+
+        label* = <pending>
+
+    where `<pending>` is the specific field.
+
+    """
 
     REGEX = r"(?P<label>\w[\w \t\-]*)(?P<required>\*)?[ \t]*=(?P<pending>.*)"
 
@@ -31,6 +94,13 @@ class Field:
 
     @classmethod
     def register(cls, rc):
+        """Register a specific field class withing this class.
+
+        Parameters
+        ----------
+        rc : SpecificField
+        """
+
         cls.FIELD_TYPES.append(rc)
         return rc
 
@@ -55,8 +125,10 @@ class Field:
 
 
 @Field.register
-@compile_regex
-class StringField(Common):
+@_compile_regex
+class StringField(SpecificField):
+    """Used to take single line input.
+    """
 
     REGEX = r"[ \t]*___(\[(?P<length>\d*)\])?" + EOL
 
@@ -70,8 +142,10 @@ class StringField(Common):
 
 
 @Field.register
-@compile_regex
-class TextAreaField(Common):
+@_compile_regex
+class TextAreaField(SpecificField):
+    """Used to take multi-line input.
+    """
 
     REGEX = r"[ \t]*AAA(\[(?P<length>\d*)\])?" + EOL
 
@@ -85,8 +159,12 @@ class TextAreaField(Common):
 
 
 @Field.register
-@compile_regex
-class DateField(Common):
+@_compile_regex
+class DateField(SpecificField):
+    """Used to take date input.
+
+    Currently, there is no way to specify the format.
+    """
 
     REGEX = r"[ \t]d/m/y" + EOL
 
@@ -96,8 +174,12 @@ class DateField(Common):
 
 
 @Field.register
-@compile_regex
-class TimeField(Common):
+@_compile_regex
+class TimeField(SpecificField):
+    """Used to take time input.
+
+    Currently, there is no way to specify the format.
+    """
 
     REGEX = r"[ \t]hh:mm" + EOL
 
@@ -107,8 +189,10 @@ class TimeField(Common):
 
 
 @Field.register
-@compile_regex
-class EmailField(Common):
+@_compile_regex
+class EmailField(SpecificField):
+    """A string field with email validation.
+    """
 
     REGEX = r"[ \t]*@" + EOL
 
@@ -118,8 +202,10 @@ class EmailField(Common):
 
 
 @Field.register
-@compile_regex
-class RadioField(Common):
+@_compile_regex
+class RadioField(SpecificField):
+    """Used to select among mutually exclusive inputs.
+    """
 
     REGEX = r"[ \t]*(?P<content>\(x?\)[ \t]*[\w \t\-]+[\(\)\w \t\-]*)" + EOL
 
@@ -144,8 +230,10 @@ class RadioField(Common):
 
 
 @Field.register
-@compile_regex
-class CheckboxField(Common):
+@_compile_regex
+class CheckboxField(SpecificField):
+    """Used to select among non-exclusive inputs.
+    """
 
     REGEX = r"[ \t]*(\[x?\][ \t]*[\w \t\-]+[\[\]\w \t\-]*)"
 
@@ -155,8 +243,10 @@ class CheckboxField(Common):
 
 
 @Field.register
-@compile_regex
-class SelectField(Common):
+@_compile_regex
+class SelectField(SpecificField):
+    """Used to select among mutually exclusive inputs, with a dropdown.
+    """
 
     REGEX = r"[ \t]*\{(?P<content>([\w \t\->_,\(\)\[\]]+))\}"
 
@@ -206,8 +296,10 @@ class SelectField(Common):
 
 
 @Field.register
-@compile_regex
-class FileField(Common):
+@_compile_regex
+class FileField(SpecificField):
+    """Used to upload a file.
+    """
 
     REGEX = r"[ \t]*...(\[(?P<allowed>[\w \t,;]*)\])?" + EOL
 

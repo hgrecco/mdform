@@ -23,7 +23,7 @@
 mdform
 ======
 
-An extension for `python-markdown`_ to generate parse a form in Markdown
+An extension for `python-markdown`_ to generate parse forms in Markdown
 based document.
 
 This document:
@@ -86,10 +86,18 @@ Usage
 .. code-block::python
 
     >>> import markdown
-    >>> md = markdown.Markdown(extensions = ['form'])
+    >>> from mdform import FormExtension
+    >>> md = markdown.Markdown(extensions = [FormExtension()])
     >>> html = md.convert(text)  # this is the jinja template
     >>> form_dict = md.Form      # this is the definition dict
 
+or use it like this to create a `WTForm`_ compatible template:
+
+    >>> import markdown
+    >>> from mdform import FormExtension
+    >>> md = markdown.Markdown(extensions = [FormExtension(wtf=True)])
+    >>> html = md.convert(text)  # this is the jinja template
+    >>> form_dict = md.Form      # this is the definition dict
 
 
 Syntax
@@ -193,6 +201,23 @@ or:
     name = ...[png,jpg;Only image files]
 
 
+DateField
+~~~~~~~~~
+
+.. code-block::
+
+    name = d/m/y
+
+
+TimeField
+~~~~~~~~~
+
+.. code-block::
+
+    name = hh:mm
+
+
+
 Required fields
 ~~~~~~~~~~~~~~~
 
@@ -269,3 +294,4 @@ see CHANGES_
 .. _`wmd`: https://github.com/brikis98/wmd
 .. _`AUTHORS`: https://github.com/hgrecco/mdform/blob/master/AUTHORS
 .. _`CHANGES`: https://github.com/hgrecco/mdform/blob/master/CHANGES
+.. _`WTForm`: https://wtforms.readthedocs.io/

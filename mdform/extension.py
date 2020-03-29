@@ -1,3 +1,13 @@
+"""
+    mdform.extension
+    ~~~~~~~~~~~~~~~~
+
+    An extension for `python-markdown`_ to generate parse forms in Markdown based document.
+
+    :copyright: 2020 by mdform Authors, see AUTHORS for more details.
+    :license: BSD, see LICENSE for more details.
+"""
+
 import re
 
 import unidecode
@@ -11,6 +21,18 @@ COLLAPSE_CLOSE_HTML = r"</div>"
 
 
 def _sanitizer(s):
+    """Default label to variable sanitizer
+
+    Parameters
+    ----------
+    s : str
+        label
+
+    Returns
+    -------
+    str
+        an identifier representing the variable
+    """
 
     s = unidecode.unidecode(s)
 
@@ -24,9 +46,19 @@ def _sanitizer(s):
 
 
 class FormPreprocessor(Preprocessor):
-    """ Get Form. """
+    """Form processor for Python-Markdown.
+
+    Parameters
+    ----------
+    md
+    sanitizer : callable str -> str
+        the label santizer function that will be used.
+    wtf : bool
+        Render the HTML to be used with WTForms. Default False.
+    """
 
     def __init__(self, md, sanitizer=None, wtf=False):
+
         self.sanitizer = sanitizer or (lambda s: s)
         self.wtf = wtf
         super().__init__(md)
@@ -114,7 +146,8 @@ class FormPreprocessor(Preprocessor):
 
 
 class FormExtension(Extension):
-    """ Form extension for Python-Markdown. """
+    """Form extension for Python-Markdown.
+    """
 
     def __init__(self, **kwargs):
         self.config = {
