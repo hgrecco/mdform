@@ -2,9 +2,9 @@ language: python
 
 env:
   - PKGS="python=3.7 flake8 black isort"  # Have linters fail first and quickly
-  - PKGS="python=3.6 markdown>=3.0.1"
-  - PKGS="python=3.7 markdown>=3.0.1"
-  - PKGS="python=3.8 markdown>=3.0.1"
+  - PKGS="python=3.6 markdown>=3.0.1 unidecode"
+  - PKGS="python=3.7 markdown>=3.0.1 unidecode"
+  - PKGS="python=3.8 markdown>=3.0.1 unidecode"
 
   # TODO: pandas tests
   # - PKGS="python=3.7 numpy pandas uncertainties pandas"
