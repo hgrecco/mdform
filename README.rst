@@ -126,13 +126,13 @@ Text area
 
 .. code-block::
 
-    name = |||
+    name = AAA
 
 or:
 
 .. code-block::
 
-    name = |||[50]
+    name = AAA[50]
 
 Exactly 3 slashes will be matched.
 
