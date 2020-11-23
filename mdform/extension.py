@@ -14,7 +14,7 @@ import unidecode
 from markdown.extensions import Extension
 from markdown.preprocessors import Preprocessor
 
-from .fields import COLLAPSE_CLOSE_RE, COLLAPSE_OPEN_RE, SECTION_RE, Field
+from .fields import COLLAPSE_CLOSE_RE, COLLAPSE_OPEN_RE, SECTION_RE, Field, FormdDict
 
 COLLAPSE_OPEN_HTML = r'<div id="accordion-%s">'
 COLLAPSE_CLOSE_HTML = r"</div>"
@@ -52,7 +52,7 @@ class FormPreprocessor(Preprocessor):
     ----------
     md
     sanitizer : callable str -> str
-        the label santizer function that will be used.
+        the label sanitizer function that will be used.
     wtf : bool
         Render the HTML to be used with WTForms. Default False.
     """
