@@ -264,6 +264,23 @@ and:
                      }
     }
 
+Sections are labeled from top to bottom, no remove a section name just do it this way.
+
+.. code-block::
+
+    [section:university]
+
+    name = ___
+
+    [section]
+
+    name = ___
+
+will render as:
+
+    {{ form.university_name }}
+    {{ form.name }}
+
 
 Collapsable parts
 ~~~~~~~~~~~~~~~~~
