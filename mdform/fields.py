@@ -46,8 +46,7 @@ def _compile_regex(cls):
 
 
 class SpecificField:
-    """"Base clase for all specific fields.
-    """
+    """ "Base clase for all specific fields."""
 
     @classmethod
     def match(cls, line):
@@ -127,8 +126,7 @@ class Field:
 @Field.register
 @_compile_regex
 class StringField(SpecificField):
-    """Used to take single line input.
-    """
+    """Used to take single line input."""
 
     REGEX = r"[ \t]*___(\[(?P<length>\d*)\])?" + EOL
 
@@ -144,8 +142,7 @@ class StringField(SpecificField):
 @Field.register
 @_compile_regex
 class TextAreaField(SpecificField):
-    """Used to take multi-line input.
-    """
+    """Used to take multi-line input."""
 
     REGEX = r"[ \t]*AAA(\[(?P<length>\d*)\])?" + EOL
 
@@ -191,8 +188,7 @@ class TimeField(SpecificField):
 @Field.register
 @_compile_regex
 class EmailField(SpecificField):
-    """A string field with email validation.
-    """
+    """A string field with email validation."""
 
     REGEX = r"[ \t]*@" + EOL
 
@@ -204,8 +200,7 @@ class EmailField(SpecificField):
 @Field.register
 @_compile_regex
 class RadioField(SpecificField):
-    """Used to select among mutually exclusive inputs.
-    """
+    """Used to select among mutually exclusive inputs."""
 
     REGEX = r"[ \t]*(?P<content>\(x?\)[ \t]*[\w \t\-]+[\(\)\w \t\-]*)" + EOL
 
@@ -232,8 +227,7 @@ class RadioField(SpecificField):
 @Field.register
 @_compile_regex
 class CheckboxField(SpecificField):
-    """Used to select among non-exclusive inputs.
-    """
+    """Used to select among non-exclusive inputs."""
 
     REGEX = r"[ \t]*(\[x?\][ \t]*[\w \t\-]+[\[\]\w \t\-]*)"
 
@@ -245,8 +239,7 @@ class CheckboxField(SpecificField):
 @Field.register
 @_compile_regex
 class SelectField(SpecificField):
-    """Used to select among mutually exclusive inputs, with a dropdown.
-    """
+    """Used to select among mutually exclusive inputs, with a dropdown."""
 
     REGEX = r"[ \t]*\{(?P<content>([\w \t\->_,\(\)\[\]]+))\}"
 
@@ -298,8 +291,7 @@ class SelectField(SpecificField):
 @Field.register
 @_compile_regex
 class FileField(SpecificField):
-    """Used to upload a file.
-    """
+    """Used to upload a file."""
 
     REGEX = r"[ \t]*...(\[(?P<allowed>[\w \t,;]*)\])?" + EOL
 

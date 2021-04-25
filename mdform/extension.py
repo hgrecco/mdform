@@ -111,7 +111,9 @@ class FormPreprocessor(Preprocessor):
                 if section:
                     variable_name = "%s_%s" % (section, variable_name)
 
-                form[variable_name] = variable_dict = dict(label=label, nolabel=nolabel, **value)
+                form[variable_name] = variable_dict = dict(
+                    label=label, nolabel=nolabel, **value
+                )
 
                 out.append(self.formatter(variable_name, variable_dict))
             else:
@@ -122,13 +124,15 @@ class FormPreprocessor(Preprocessor):
 
 
 class FormExtension(Extension):
-    """Form extension for Python-Markdown.
-    """
+    """Form extension for Python-Markdown."""
 
     def __init__(self, **kwargs):
         self.config = {
             "sanitizer": [_sanitizer, "Function to sanitize the label"],
-            "formatter": [default_formatter, f"Use format template for fields. The signature must be (str, dict)->str"],
+            "formatter": [
+                default_formatter,
+                "Use format template for fields. The signature must be (str, dict)->str",
+            ],
         }
         super().__init__(**kwargs)
 
@@ -136,7 +140,9 @@ class FormExtension(Extension):
         md.registerExtension(self)
         self.md = md
         md.preprocessors.register(
-            FormPreprocessor(md, self.getConfig("sanitizer"), self.getConfig("formatter")),
+            FormPreprocessor(
+                md, self.getConfig("sanitizer"), self.getConfig("formatter")
+            ),
             "form",
             30,
         )
