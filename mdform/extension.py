@@ -46,7 +46,7 @@ def _sanitizer(s):
 
 
 def default_formatter(variable_name, variable_dict):
-    return "{{ " + f"{variable_name}" + " }}"
+    return "{{ " + f"form.{variable_name}" + " }}"
 
 
 class FormPreprocessor(Preprocessor):
