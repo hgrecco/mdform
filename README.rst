@@ -53,7 +53,7 @@ will generate the following jinja template:
     {{ form.do_you_like_this }}
 
 
-and this dict:
+and this definition dictionary:
 
 .. code-block:: python
 
@@ -91,8 +91,8 @@ Usage
     >>> html = md.convert(text)           # this is the jinja template
     >>> form_dict = md.mdform_definition  # this is the definition dict
 
-The html output will be a jinja2_ template and `mdform_definition` a dict
-describing the form.
+The html output will be a jinja2_ template and a dictionary describing
+the form (**mdform_definition**)
 
 
 Syntax
@@ -100,7 +100,7 @@ Syntax
 
 The syntax is strongly based on this wmd_ fork.
 
-All fields are parsed into a dictionary (`mdform_definition`). The keys are
+All fields are parsed into a dictionary (**mdform_definition**). The keys are
 the form labels and the value is another dictionary with the following
 elements:
 
