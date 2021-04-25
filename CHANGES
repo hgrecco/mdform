@@ -4,7 +4,7 @@ mdform Changelog
 0.4 (unreleased)
 ----------------
 
-- Nothing changed yet.
+- Re-export Markdown
 
 
 0.3 (2021-04-25)
