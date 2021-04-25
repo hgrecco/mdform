@@ -1,6 +1,4 @@
-from markdown import Markdown
-
-from ..extension import FormExtension
+from mdform import FormExtension, Markdown
 
 TEXT = """
 Welcome to the form tester

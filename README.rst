@@ -85,9 +85,8 @@ Usage
 
 .. code-block:: python
 
-    >>> import markdown
-    >>> from mdform import FormExtension
-    >>> md = markdown.Markdown(extensions = [FormExtension()])
+    >>> from mdform import FormExtension, Markdown # Markdown is just re-exported from python-markdown
+    >>> md = Markdown(extensions = [FormExtension()])
     >>> html = md.convert(text)           # this is the jinja template
     >>> form_dict = md.mdform_definition  # this is the definition dict
 

@@ -9,6 +9,7 @@
 """
 
 import pkg_resources
+from markdown import Markdown
 
 from .extension import FormExtension
 
@@ -19,4 +20,4 @@ except Exception:  # pragma: no cover
     # so the reported version will be unknown
     __version__ = "unknown"
 
-__all__ = (FormExtension, __version__)
+__all__ = (FormExtension, __version__, Markdown)
