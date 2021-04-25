@@ -49,6 +49,12 @@ def default_formatter(variable_name, variable_dict):
     return "{{ " + f"form.{variable_name}" + " }}"
 
 
+def _value_to_name(value):
+    if value is None:
+        return ""
+    return value.lower().strip()
+
+
 class FormPreprocessor(Preprocessor):
     """Form processor for Python-Markdown.
 
@@ -71,6 +77,7 @@ class FormPreprocessor(Preprocessor):
 
     def run(self, lines):
         """ Parse Form and store in Markdown.Form. """
+        unnamed_collapese_cnt = 0
         form = {}
         section = None
 
@@ -78,13 +85,17 @@ class FormPreprocessor(Preprocessor):
         for line in lines:
             m1 = SECTION_RE.match(line)
             if m1:
-                section = m1.group("name").lower().strip()
+                section = _value_to_name(m1.group("name"))
                 continue
 
             m1 = COLLAPSE_OPEN_RE.match(line)
             if m1:
-                control_field = m1.group("name").lower().strip()
-                control_field = self.sanitizer(control_field)
+                control_field = _value_to_name(m1.group("name"))
+                if control_field:
+                    control_field = self.sanitizer(control_field)
+                else:
+                    control_field = str(unnamed_collapese_cnt)
+                    unnamed_collapese_cnt += 1
                 if section:
                     control_field = "%s_%s" % (section, control_field)
 

@@ -31,10 +31,10 @@ import re
 EOL = r"[ \t]?$"
 
 #: Section definition.
-SECTION_RE = re.compile(r"\[section[ \t]*:(?P<name>.*)\]", re.UNICODE)
+SECTION_RE = re.compile(r"\[section[ \t]*(:(?P<name>.*))?\]", re.UNICODE)
 
 #: Open of collapsable part.
-COLLAPSE_OPEN_RE = re.compile(r"\[collapse[ \t]*:(?P<name>.*)\]", re.UNICODE)
+COLLAPSE_OPEN_RE = re.compile(r"\[collapse[ \t]*(:(?P<name>.*))?\]", re.UNICODE)
 
 #: Close of collapsable part.
 COLLAPSE_CLOSE_RE = re.compile(r"\[endcollapse]")
