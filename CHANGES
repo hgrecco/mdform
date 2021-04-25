@@ -1,7 +1,7 @@
 mdform Changelog
 =======================
 
-0.3 (unreleased)
+0.3 (2021-04-25)
 ----------------
 
 - Implemented IntegerField
