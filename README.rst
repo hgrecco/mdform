@@ -109,12 +109,12 @@ The syntax is strongly based on this wmd_ fork.
 
 All fields are parsed into a dictionary with the following values:
 
-    - type: str
-      (e.g. StringField, TextAreaField, etc)
+- type: str
+  (e.g. StringField, TextAreaField, etc)
 
 
 Text fields (StringField)
-~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block::
 
@@ -136,11 +136,11 @@ Customizing:
 
 Specific dict values:
 
-    - length : int or None (default)
+- length : int or None (default)
 
 
 Text area (TextAreaField)
-~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block::
 
@@ -162,11 +162,11 @@ Customizing:
 
 Specific dict values:
 
-    - length : int or None (default)
+- length : int or None (default)
 
 
 Radio buttons (RadioField)
-~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block::
 
@@ -176,12 +176,12 @@ Optionally, an `x` can be used to indicate the default value.
 
 Specific dict values:
 
-    - values : tuple of str
-    - default : str
+- values : tuple of str
+- default : str
 
 
 Check boxes (CheckboxField)
-~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block::
 
@@ -191,12 +191,12 @@ Optionally, an `x` can be used to indicate the default values.
 
 Specific dict values:
 
-    - values : tuple of strings
-    - default : tuple of str
+- values : tuple of strings
+- default : tuple of str
 
 
 Drop down (SelectField)
-~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block::
 
@@ -216,14 +216,14 @@ The option in parenthesis will be the default.
 
 Specific dict values:
 
-    - choices : tuple of (str, str) (key, value)
-    - default : str
-    - collapse_on: str or None
-      Item used to collapse. Format "~value" or "value"
+- choices : tuple of (str, str) (key, value)
+- default : str
+- collapse_on: str or None
+  Item used to collapse. Format "~value" or "value"
 
 
 File Field (FileField)
-~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block::
 
@@ -248,12 +248,12 @@ or:
 
 Specific dict values:
 
-    - allowed : tuple of str
-    - description : str
+- allowed : tuple of str
+- description : str
 
 
 Date Field (DateField)
-~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block::
 
@@ -261,7 +261,7 @@ Date Field (DateField)
 
 
 Time Field (TimeField)
-~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block::
 
@@ -281,7 +281,7 @@ To flag a field as required, just add an asterisk after the name.
 
 Specific dict values:
 
-    - required: bool
+- required: bool
 
 
 Sections
