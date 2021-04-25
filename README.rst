@@ -91,7 +91,9 @@ Usage
     >>> html = md.convert(text)  # this is the jinja template
     >>> form_dict = md.Form      # this is the definition dict
 
-or use it like this to create a `WTForm`_ compatible template:
+By default, the html output will be a jinja2 template that uses WTForms_`.
+
+Òr use it like this to create a `Flask-Bootstrap4` and `WTForm`_ compatible template:
 
     >>> import markdown
     >>> from mdform import FormExtension
@@ -295,3 +297,4 @@ see CHANGES_
 .. _`AUTHORS`: https://github.com/hgrecco/mdform/blob/master/AUTHORS
 .. _`CHANGES`: https://github.com/hgrecco/mdform/blob/master/CHANGES
 .. _`WTForm`: https://wtforms.readthedocs.io/
+.. _`Flask-Bootstrap4`: https://pypi.org/project/Flask-Bootstrap4/

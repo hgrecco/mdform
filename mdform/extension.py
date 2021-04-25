@@ -45,6 +45,10 @@ def _sanitizer(s):
     return s
 
 
+def default_formatter(variable_name, variable_dict):
+    return "{{ " + f"{variable_name}" + " }}"
+
+
 class FormPreprocessor(Preprocessor):
     """Form processor for Python-Markdown.
 
@@ -52,15 +56,17 @@ class FormPreprocessor(Preprocessor):
     ----------
     md
     sanitizer : callable str -> str
-        the label santizer function that will be used.
-    wtf : bool
-        Render the HTML to be used with WTForms. Default False.
+        the label sanitizer function that will be used.
+    fmt : str
+        Formatting spec for HTML.
+
     """
 
-    def __init__(self, md, sanitizer=None, wtf=False):
-
+    def __init__(self, md, sanitizer=None, formatter=default_formatter):
         self.sanitizer = sanitizer or (lambda s: s)
-        self.wtf = wtf
+        if formatter is None:
+            formatter = default_formatter
+        self.formatter = formatter
         super().__init__(md)
 
     def run(self, lines):
@@ -105,39 +111,9 @@ class FormPreprocessor(Preprocessor):
                 if section:
                     variable_name = "%s_%s" % (section, variable_name)
 
-                form[variable_name] = dict(label=label, **value)
+                form[variable_name] = variable_dict = dict(label=label, nolabel=nolabel, **value)
 
-                if self.wtf:
-                    args = ["form.%s" % variable_name]
-                    args.append("form_type='horizontal'")
-
-                    tag_class = ["form-control"]
-                    if nolabel:
-                        tag_class.append("nolabel")
-
-                    collapse_on = value.get("collapse_on")
-                    if collapse_on:
-                        comparator = "!=="
-                        if collapse_on.startswith("~"):
-                            collapse_on = collapse_on[1:]
-                            comparator = "==="
-                        else:
-                            comparator = "!=="
-
-                        tag_class.append("collapser")
-                        args.append(
-                            """ onchange="jQuery('#accordion-%s').toggle(jQuery(this).val() %s '%s');" """
-                            % (variable_name, comparator, collapse_on)
-                        )
-
-                    args.append('class="%s"' % " ".join("%s" % c for c in tag_class))
-
-                    if value.get("length") is not None:
-                        args.append("maxlength=%d" % value["length"])
-
-                    out.append("{{ wtf.form_field(%s) }}" % (", ".join(args)))
-                else:
-                    out.append("{{ form.%s }}" % variable_name)
+                out.append(self.formatter(variable_name, variable_dict))
             else:
                 out.append(line)
 
@@ -152,7 +128,7 @@ class FormExtension(Extension):
     def __init__(self, **kwargs):
         self.config = {
             "sanitizer": [_sanitizer, "Function to sanitize the label"],
-            "wtf": [False, "Use wtf template for fields"],
+            "formatter": [default_formatter, f"Use format template for fields. The signature must be (str, dict)->str"],
         }
         super().__init__(**kwargs)
 
@@ -160,7 +136,7 @@ class FormExtension(Extension):
         md.registerExtension(self)
         self.md = md
         md.preprocessors.register(
-            FormPreprocessor(md, self.getConfig("sanitizer"), self.getConfig("wtf")),
+            FormPreprocessor(md, self.getConfig("sanitizer"), self.getConfig("formatter")),
             "form",
             30,
         )
