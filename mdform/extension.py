@@ -130,7 +130,7 @@ class FormPreprocessor(Preprocessor):
             else:
                 out.append(line)
 
-        self.md.Form = form
+        self.md.mdform_definition = form
         return out
 
 
@@ -159,7 +159,7 @@ class FormExtension(Extension):
         )
 
     def reset(self):
-        self.md.Form = {}
+        self.md.mdform_definition = {}
 
 
 def makeExtension(**kwargs):

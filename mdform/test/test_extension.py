@@ -84,10 +84,10 @@ FORM = {
 def test_default():
     md = Markdown(extensions=[FormExtension()])
     assert md.convert(TEXT) == DEFAULT_FORMATTED
-    assert md.Form == FORM
+    assert md.mdform_definition == FORM
 
 
 def test_default_None():
     md = Markdown(extensions=[FormExtension(formatter=None)])
     assert md.convert(TEXT) == DEFAULT_FORMATTED
-    assert md.Form == FORM
+    assert md.mdform_definition == FORM
