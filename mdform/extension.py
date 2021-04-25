@@ -63,8 +63,8 @@ class FormPreprocessor(Preprocessor):
     md
     sanitizer : callable str -> str
         the label sanitizer function that will be used.
-    fmt : str
-        Formatting spec for HTML.
+    formatter : callable (str, dict) -> str
+        Form field formatter function.
 
     """
 
