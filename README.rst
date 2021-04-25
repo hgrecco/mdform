@@ -91,7 +91,8 @@ Usage
     >>> html = md.convert(text)           # this is the jinja template
     >>> form_dict = md.mdform_definition  # this is the definition dict
 
-The html output will be a jinja2_ template.
+The html output will be a jinja2_ template and `mdform_definition` a dict
+describing the form.
 
 
 Syntax
@@ -99,7 +100,9 @@ Syntax
 
 The syntax is strongly based on this wmd_ fork.
 
-All fields are parsed into a dictionary with the following values:
+All fields are parsed into a dictionary (`mdform_definition`). The keys are
+the form labels and the value is another dictionary with the following
+elements:
 
 - type: str
   (e.g. StringField, TextAreaField, etc)
