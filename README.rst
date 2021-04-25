@@ -28,7 +28,7 @@ based document.
 
 This document:
 
-.. code-block::
+.. code-block:: text
 
     Please fill this form:
 
@@ -41,7 +41,7 @@ This document:
 
 will generate the following jinja template:
 
-.. code-block::
+.. code-block:: text
 
     Please fill this form:
 
@@ -55,7 +55,7 @@ will generate the following jinja template:
 
 and this dict:
 
-.. code-block::python
+.. code-block:: python
 
     {'name': {'type': 'StringField',
               'required': True,
@@ -76,14 +76,14 @@ that you can consume to generate a form.
 Installation
 ------------
 
-.. code-block::
+.. code-block:: bash
 
     pip install mdform
 
 Usage
 -----
 
-.. code-block::python
+.. code-block:: python
 
     >>> import markdown
     >>> from mdform import FormExtension
@@ -94,6 +94,8 @@ Usage
 By default, the html output will be a jinja2 template that uses WTForms_`.
 
 Òr use it like this to create a `Flask-Bootstrap4` and `WTForm`_ compatible template:
+
+.. code-block:: python
 
     >>> import markdown
     >>> from mdform import FormExtension
@@ -116,13 +118,13 @@ All fields are parsed into a dictionary with the following values:
 Text fields (StringField)
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. code-block::
+.. code-block:: text
 
     name = ___
 
 or:
 
-.. code-block::
+.. code-block:: text
 
     name = ___[50]
 
@@ -130,7 +132,7 @@ Exactly 3 underscores will be matched. Any more will be handled as standard unde
 
 Customizing:
 
-.. code-block::
+.. code-block:: text
 
     name = ___[length]
 
@@ -142,13 +144,13 @@ Specific dict values:
 Text area (TextAreaField)
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. code-block::
+.. code-block:: text
 
     name = AAA
 
 or:
 
-.. code-block::
+.. code-block:: text
 
     name = AAA[50]
 
@@ -156,7 +158,7 @@ Exactly 3 slashes will be matched.
 
 Customizing:
 
-.. code-block::
+.. code-block:: text
 
     name = ___[length]
 
@@ -168,7 +170,7 @@ Specific dict values:
 Radio buttons (RadioField)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. code-block::
+.. code-block:: text
 
     sex = (x) male () female
 
@@ -183,7 +185,7 @@ Specific dict values:
 Check boxes (CheckboxField)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. code-block::
+.. code-block:: text
 
     phones = [] Android [x] iPhone [x] Blackberry
 
@@ -198,17 +200,17 @@ Specific dict values:
 Drop down (SelectField)
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-.. code-block::
+.. code-block:: text
 
     city = {BOS, SFO, (NYC)}
 
 Or with user-friendly labels:
 
-.. code-block::
+.. code-block:: text
 
     city = {BOS -> Boston, SFO -> San Francisco, (NYC -> New York City)}
 
-.. code-block::
+.. code-block:: text
 
     city = {BOS, SFO, (NYC -> New York City)}
 
@@ -225,23 +227,23 @@ Specific dict values:
 File Field (FileField)
 ~~~~~~~~~~~~~~~~~~~~~~
 
-.. code-block::
+.. code-block:: text
 
     name = ...
 
 or:
 
-.. code-block::
+.. code-block:: text
 
     name = ...[png]
 
 
-.. code-block::
+.. code-block:: text
 
     name = ...[png,jpg]
 
 
-.. code-block::
+.. code-block:: text
 
     name = ...[png,jpg;Only image files]
 
@@ -255,7 +257,7 @@ Specific dict values:
 Date Field (DateField)
 ~~~~~~~~~~~~~~~~~~~~~~
 
-.. code-block::
+.. code-block:: text
 
     name = d/m/y
 
@@ -263,7 +265,7 @@ Date Field (DateField)
 Time Field (TimeField)
 ~~~~~~~~~~~~~~~~~~~~~~
 
-.. code-block::
+.. code-block:: text
 
     name = hh:mm
 
@@ -274,7 +276,7 @@ Required fields
 
 To flag a field as required, just add an asterisk after the name.
 
-.. code-block::
+.. code-block:: text
 
     zip code* = ___
 
@@ -289,7 +291,7 @@ Sections
 
 In certain cases is useful to create a named section.
 
-.. code-block::
+.. code-block:: text
 
     [section:university]
 
@@ -306,7 +308,7 @@ will render as:
 
 and:
 
-.. code-block::
+.. code-block:: python
 
     {'university_name': {'type': 'StringField',
                          'required': True,
@@ -320,7 +322,7 @@ and:
 
 Sections are labeled from top to bottom, no remove a section name just do it this way.
 
-.. code-block::
+.. code-block:: text
 
     [section:university]
 
@@ -331,6 +333,8 @@ Sections are labeled from top to bottom, no remove a section name just do it thi
     name = ___
 
 will render as:
+
+.. code-block:: text
 
     {{ form.university_name }}
     {{ form.name }}
@@ -344,7 +348,7 @@ on the value of a dropdown box. Just use the modifier `[c]` for the dropdown ite
 that will collapse the part of the html and enclose the collapsable part as
 shown:
 
-.. code-block::
+.. code-block:: text
 
     extra = {Yes, (No[c])}
 
