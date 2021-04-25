@@ -1,4 +1,6 @@
 from mdform.fields import (
+    CheckboxField,
+    DateField,
     EmailField,
     Field,
     FileField,
@@ -6,6 +8,7 @@ from mdform.fields import (
     SelectField,
     StringField,
     TextAreaField,
+    TimeField,
 )
 
 
@@ -43,6 +46,20 @@ def test_area_field():
     assert TextAreaField.match("AAA[]") == dict(length=None)
 
 
+def test_date_field():
+    assert DateField.match("") is None
+    assert DateField.match("d/m/y") == dict()
+    assert DateField.match(" d/m/y") == dict()
+    assert DateField.match(" d/m/y ") == dict()
+
+
+def test_time_field():
+    assert TimeField.match("") is None
+    assert TimeField.match("hh:mm") == dict()
+    assert TimeField.match(" hh:mm") == dict()
+    assert TimeField.match(" hh:mm ") == dict()
+
+
 def test_email_field():
     assert EmailField.match("") is None
     assert EmailField.match("@") == dict()
@@ -50,7 +67,24 @@ def test_email_field():
     assert EmailField.match(" @ ") == dict()
 
 
+def test_checkbox_field():
+    assert CheckboxField.match("") is None
+    assert CheckboxField.match("[] A [] B []") == dict(
+        choices=("A", "B", ""), default=tuple()
+    )
+    assert CheckboxField.match("[] A [x] B [] C") == dict(
+        choices=("A", "B", "C"), default=("B",)
+    )
+    assert CheckboxField.match("[] A [x] B [x] C") == dict(
+        choices=("A", "B", "C"), default=("B", "C")
+    )
+    assert CheckboxField.match("[] A [] B [] C") == dict(
+        choices=("A", "B", "C"), default=tuple()
+    )
+
+
 def test_radio_field():
+    assert RadioField.match("") is None
     assert RadioField.match("() A () B ()") == dict(
         choices=("A", "B", ""), default=None
     )
@@ -86,6 +120,7 @@ def test_select_field():
 
 
 def test_filefield():
+    assert FileField.match("") is None
     assert FileField.match("...") == dict(allowed=None, description=None)
     assert FileField.match("...[png]") == dict(allowed=("png",), description=None)
     assert FileField.match("...[png,jpg]") == dict(

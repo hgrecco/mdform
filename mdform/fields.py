@@ -8,7 +8,7 @@
         - DateField             d/m/y
         - TimeField             hh:mm
         - EmailField            @
-        - RadioField            (x) A () B      (the x is optional
+        - RadioField            (x) A () B      (the x is optional)
         - CheckboxField         [x] A [] B      (the x is optional)
         - SelectField           {(A), B}        (the parenthesis are optiona)
         - FileField             ...[allowed]    (allowed is optional, extensions; description)
@@ -163,7 +163,7 @@ class DateField(SpecificField):
     Currently, there is no way to specify the format.
     """
 
-    REGEX = r"[ \t]d/m/y" + EOL
+    REGEX = r"[ \t]*d/m/y" + EOL
 
     @classmethod
     def process(cls, m):
@@ -178,7 +178,7 @@ class TimeField(SpecificField):
     Currently, there is no way to specify the format.
     """
 
-    REGEX = r"[ \t]hh:mm" + EOL
+    REGEX = r"[ \t]*hh:mm" + EOL
 
     @classmethod
     def process(cls, m):
@@ -229,11 +229,27 @@ class RadioField(SpecificField):
 class CheckboxField(SpecificField):
     """Used to select among non-exclusive inputs."""
 
-    REGEX = r"[ \t]*(\[x?\][ \t]*[\w \t\-]+[\[\]\w \t\-]*)"
+    # REGEX = r"[ \t]*(\[x?\][ \t]*[\w \t\-]+[\[\]\w \t\-]*)"
+    REGEX = r"[ \t]*(?P<content>\[x?\][ \t]*[\w \t\-]+[\[\]\w \t\-]*)" + EOL
+
+    SUBREGEX = re.compile(
+        r"\[(?P<is_default>x?)\][ \t]*(?P<label>[a-zA-Z0-9 \t_\-]?)", re.UNICODE
+    )
 
     @classmethod
     def process(cls, m):
-        return dict(value=m)
+        items = []
+        default = []
+
+        for matched in cls.SUBREGEX.finditer(m.group("content")):
+            label = matched.group("label").strip()
+
+            items.append(label)
+
+            if matched.group("is_default") == "x":
+                default.append(label)
+
+        return dict(choices=tuple(items), default=tuple(default))
 
 
 @Field.register
