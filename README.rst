@@ -107,7 +107,13 @@ Syntax
 
 The syntax is strongly based on this wmd_ fork.
 
-Text fields
+All fields are parsed into a dictionary with the following values:
+
+    - type: str
+      (e.g. StringField, TextAreaField, etc)
+
+
+Text fields (StringField)
 ~~~~~~~~~~~
 
 .. code-block::
@@ -122,8 +128,18 @@ or:
 
 Exactly 3 underscores will be matched. Any more will be handled as standard underline directives.
 
+Customizing:
 
-Text area
+.. code-block::
+
+    name = ___[length]
+
+Specific dict values:
+
+    - length : int or None (default)
+
+
+Text area (TextAreaField)
 ~~~~~~~~~
 
 .. code-block::
@@ -138,28 +154,48 @@ or:
 
 Exactly 3 slashes will be matched.
 
+Customizing:
 
-Radio buttons
+.. code-block::
+
+    name = ___[length]
+
+Specific dict values:
+
+    - length : int or None (default)
+
+
+Radio buttons (RadioField)
 ~~~~~~~~~~~~~
 
 .. code-block::
 
     sex = (x) male () female
 
-The option with an `x` will be the default.
+Optionally, an `x` can be used to indicate the default value.
+
+Specific dict values:
+
+    - values : tuple of str
+    - default : str
 
 
-Check boxes
+Check boxes (CheckboxField)
 ~~~~~~~~~~~
 
 .. code-block::
 
     phones = [] Android [x] iPhone [x] Blackberry
 
-The option with an `x` will be the default.
+Optionally, an `x` can be used to indicate the default values.
+
+Specific dict values:
+
+    - values : tuple of strings
+    - default : tuple of str
 
 
-Drop down
+Drop down (SelectField)
 ~~~~~~~~~
 
 .. code-block::
@@ -178,8 +214,15 @@ Or with user-friendly labels:
 
 The option in parenthesis will be the default.
 
+Specific dict values:
 
-File Field
+    - choices : tuple of (str, str) (key, value)
+    - default : str
+    - collapse_on: str or None
+      Item used to collapse. Format "~value" or "value"
+
+
+File Field (FileField)
 ~~~~~~~~~~
 
 .. code-block::
@@ -203,16 +246,22 @@ or:
     name = ...[png,jpg;Only image files]
 
 
-DateField
-~~~~~~~~~
+Specific dict values:
+
+    - allowed : tuple of str
+    - description : str
+
+
+Date Field (DateField)
+~~~~~~~~~~
 
 .. code-block::
 
     name = d/m/y
 
 
-TimeField
-~~~~~~~~~
+Time Field (TimeField)
+~~~~~~~~~~
 
 .. code-block::
 
@@ -228,6 +277,11 @@ To flag a field as required, just add an asterisk after the name.
 .. code-block::
 
     zip code* = ___
+
+
+Specific dict values:
+
+    - required: bool
 
 
 Sections
