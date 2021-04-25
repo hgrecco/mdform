@@ -4,6 +4,8 @@ from mdform.fields import (
     EmailField,
     Field,
     FileField,
+    FloatField,
+    IntegerField,
     RadioField,
     SelectField,
     StringField,
@@ -32,6 +34,33 @@ def test_string_field():
     assert StringField.match("___[30] ") == dict(length=30)
     assert StringField.match(" ___[30] ") == dict(length=30)
     assert StringField.match("___[]") == dict(length=None)
+
+
+def test_integer_field():
+    assert IntegerField.match("") is None
+    assert IntegerField.match("###[]") is None
+    assert IntegerField.match("###[0:2:1:0]") is None
+    assert IntegerField.match("###[0:s:1]") is None
+    assert IntegerField.match("###[0:0.4:1]") is None
+
+    assert IntegerField.match("###") == dict(min=None, max=None, step=None)
+    assert IntegerField.match("###[2]") == dict(min=None, max=2, step=None)
+    assert IntegerField.match("###[0:2]") == dict(min=0, max=2, step=None)
+    assert IntegerField.match("###[0:2:1]") == dict(min=0, max=2, step=1)
+
+
+def test_float_field():
+    # assert FloatField.match("") is None
+    # assert FloatField.match("#.#[]") is None
+    # assert FloatField.match("#.#[0:2:1:0]") is None
+    # assert FloatField.match("#.#[0:s:1]") is None
+    # assert FloatField.match("#.#[0:0.4:1]") is None
+
+    assert FloatField.match("#.#") == dict(min=None, max=None, step=None)
+    assert FloatField.match("#.#[2]") == dict(min=None, max=2.0, step=None)
+    assert FloatField.match("#.#[0:2]") == dict(min=0.0, max=2.0, step=None)
+    assert FloatField.match("#.#[0:2:1]") == dict(min=0.0, max=2.0, step=1.0)
+    assert FloatField.match("#.#[0:2:0.5]") == dict(min=0.0, max=2.0, step=0.5)
 
 
 def test_area_field():

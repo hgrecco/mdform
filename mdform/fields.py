@@ -4,6 +4,8 @@
 
     Fields:
         - StringField           ___[length]     (length is optional)
+        - IntegerField          ###[min:max:step]
+        - FloatField            #.#[min:max:step]
         - TextAreaField         AAA[length]     (length is optional)
         - DateField             d/m/y
         - TimeField             hh:mm
@@ -43,6 +45,28 @@ COLLAPSE_CLOSE_RE = re.compile(r"\[endcollapse]")
 def _compile_regex(cls):
     cls.REGEX = re.compile(cls.REGEX, re.UNICODE)
     return cls
+
+
+def _parse_or_none(el: str, typ):
+    if el == "none":
+        return None
+    return typ(el)
+
+
+def _parse_range_args(s: str, typ):
+    if s is None:
+        return None, None, None
+
+    s = [_parse_or_none(el, typ) for el in s.lower().strip().split(":")]
+
+    if len(s) == 1:
+        return None, s[0], None
+    elif len(s) == 2:
+        return s[0], s[1], None
+    elif len(s) == 3:
+        return s[0], s[1], s[2]
+
+    raise ValueError
 
 
 class SpecificField:
@@ -137,6 +161,40 @@ class StringField(SpecificField):
             length = int(length)
 
         return dict(length=length)
+
+
+@Field.register
+@_compile_regex
+class IntegerField(SpecificField):
+    """Used to take single line input."""
+
+    REGEX = r"[ \t]*###(\[(?P<range>[\d:]*)\])?" + EOL
+
+    @classmethod
+    def process(cls, m):
+        try:
+            mn, mx, step = _parse_range_args(m.group("range"), int)
+        except Exception:
+            return None
+
+        return dict(min=mn, max=mx, step=step)
+
+
+@Field.register
+@_compile_regex
+class FloatField(SpecificField):
+    """Used to take single line input."""
+
+    REGEX = r"[ \t]*#\.#(\[(?P<range>[\d\.:]*)\])?" + EOL
+
+    @classmethod
+    def process(cls, m):
+        try:
+            mn, mx, step = _parse_range_args(m.group("range"), float)
+        except Exception:
+            return None
+
+        return dict(min=mn, max=mx, step=step)
 
 
 @Field.register
