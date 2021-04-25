@@ -4,7 +4,13 @@ mdform Changelog
 0.3 (unreleased)
 ----------------
 
-- Nothing changed yet.
+- Implemented IntegerField
+- Implemented FloatField
+- Improved coverage, testing and docstrings
+- `.Form` has been renamed to `mdform_definitions`
+  BACKWARDS INCOMPATIBLE CHANGE
+- mdform now provide very basic formatting, adding a hook
+  to format fields.
 
 
 0.2 (2020-03-26)
