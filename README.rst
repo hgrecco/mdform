@@ -88,20 +88,10 @@ Usage
     >>> import markdown
     >>> from mdform import FormExtension
     >>> md = markdown.Markdown(extensions = [FormExtension()])
-    >>> html = md.convert(text)  # this is the jinja template
-    >>> form_dict = md.Form      # this is the definition dict
+    >>> html = md.convert(text)           # this is the jinja template
+    >>> form_dict = md.mdform_definition  # this is the definition dict
 
-By default, the html output will be a jinja2 template that uses WTForms_`.
-
-Òr use it like this to create a `Flask-Bootstrap4` and `WTForm`_ compatible template:
-
-.. code-block:: python
-
-    >>> import markdown
-    >>> from mdform import FormExtension
-    >>> md = markdown.Markdown(extensions = [FormExtension(wtf=True)])
-    >>> html = md.convert(text)  # this is the jinja template
-    >>> form_dict = md.Form      # this is the definition dict
+The html output will be a jinja2_ template.
 
 
 Syntax
@@ -139,6 +129,66 @@ Customizing:
 Specific dict values:
 
 - length : int or None (default)
+
+
+Integer fields (IntegerField)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: text
+
+    value = ###
+
+or:
+
+.. code-block:: text
+
+    value = ###[0:2:1]
+
+Exactly 3 numeral will be matched. Any more will be handled as standard directives.
+
+Customizing:
+
+.. code-block:: text
+
+    value = ###[range]
+
+The `range` is parsed like a numpy range.
+
+Specific dict values:
+
+- min : int or None (default)
+- max : int or None (default)
+- step : int or None (default)
+
+
+Float fields (FloatField)
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: text
+
+    value = #.#
+
+or:
+
+.. code-block:: text
+
+    value = #.#[0:2:0.5]
+
+Exactly 3 numeral will be matched. Any more will be handled as standard directives.
+
+Customizing:
+
+.. code-block:: text
+
+    value = #.#[range]
+
+The `range` is parsed like a numpy range.
+
+Specific dict values:
+
+- min : float or None (default)
+- max : float or None (default)
+- step : float or None (default)
 
 
 Text area (TextAreaField)
@@ -371,5 +421,4 @@ see CHANGES_
 .. _`wmd`: https://github.com/brikis98/wmd
 .. _`AUTHORS`: https://github.com/hgrecco/mdform/blob/master/AUTHORS
 .. _`CHANGES`: https://github.com/hgrecco/mdform/blob/master/CHANGES
-.. _`WTForm`: https://wtforms.readthedocs.io/
-.. _`Flask-Bootstrap4`: https://pypi.org/project/Flask-Bootstrap4/
+.. _jinja2: https://jinja.palletsprojects.com/
