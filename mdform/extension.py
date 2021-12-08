@@ -65,7 +65,6 @@ class FormPreprocessor(Preprocessor):
         the label sanitizer function that will be used.
     formatter : callable (str, dict) -> str
         Form field formatter function.
-
     """
 
     def __init__(self, md, sanitizer=None, formatter=default_formatter):
