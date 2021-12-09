@@ -2,5 +2,5 @@
 # flake8: noqa
 
 # fmt: off
-__version__ = '0.4'
+__version__ = '0.5.dev0'
 # fmt: on
