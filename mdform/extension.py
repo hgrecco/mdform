@@ -8,19 +8,22 @@
     :license: BSD, see LICENSE for more details.
 """
 
+from __future__ import annotations
+
 import re
+from typing import Dict
 
 import unidecode
 from markdown.extensions import Extension
 from markdown.preprocessors import Preprocessor
 
-from .fields import COLLAPSE_CLOSE_RE, COLLAPSE_OPEN_RE, SECTION_RE, Field
+from .fields import COLLAPSE_CLOSE_RE, COLLAPSE_OPEN_RE, SECTION_RE, Field, FieldDict
 
 COLLAPSE_OPEN_HTML = r'<div id="accordion-%s">'
 COLLAPSE_CLOSE_HTML = r"</div>"
 
 
-def _sanitizer(s):
+def default_label_sanitizer(s: str) -> str:
     """Default label to variable sanitizer
 
     Parameters
@@ -45,7 +48,21 @@ def _sanitizer(s):
     return s
 
 
-def default_formatter(variable_name, variable_dict):
+def default_field_formatter(variable_name: str, variable_dict: FieldDict) -> str:
+    """Default form field formatter.
+
+    Parameters
+    ----------
+    variable_name : str
+        field name.
+    variable_dict : FieldDict
+        definition dictionary of the field.
+
+    Returns
+    -------
+    str
+        an HTML or similar formatter.
+    """
     return "{{ " + f"form.{variable_name}" + " }}"
 
 
@@ -62,15 +79,18 @@ class FormPreprocessor(Preprocessor):
     ----------
     md
     sanitizer : callable str -> str
-        the label sanitizer function that will be used.
+        label sanitizer function that will be used.
     formatter : callable (str, dict) -> str
-        Form field formatter function.
+        form field formatter function.
     """
 
-    def __init__(self, md, sanitizer=None, formatter=default_formatter):
+    # dictionary mapping labels to
+    mdform_definition: Dict[str, FieldDict] = {}
+
+    def __init__(self, md, sanitizer=None, formatter=default_field_formatter):
         self.sanitizer = sanitizer or (lambda s: s)
         if formatter is None:
-            formatter = default_formatter
+            formatter = default_field_formatter
         self.formatter = formatter
         super().__init__(md)
 
@@ -138,9 +158,9 @@ class FormExtension(Extension):
 
     def __init__(self, **kwargs):
         self.config = {
-            "sanitizer": [_sanitizer, "Function to sanitize the label"],
+            "sanitizer": [default_label_sanitizer, "Function to sanitize the label"],
             "formatter": [
-                default_formatter,
+                default_field_formatter,
                 "Use format template for fields. The signature must be (str, dict)->str",
             ],
         }

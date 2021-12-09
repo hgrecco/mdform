@@ -13,9 +13,9 @@
         - DateField             d/m/y
         - TimeField             hh:mm
         - EmailField            @
-        - RadioField            (x) A () B      (the x is optional)
-        - CheckboxField         [x] A [] B      (the x is optional)
-        - SelectField           {(A), B}        (the parenthesis are optiona)
+        - RadioField            (x) A () B      (the x is optional, defines a default choice)
+        - CheckboxField         [x] A [] B      (the x is optional, defines a default choice)
+        - SelectField           {(A), B}        (the parenthesis are optional, defines a default choice)
         - FileField             ...[allowed]    (allowed is optional, extensions; description)
 
     Organization:
@@ -30,12 +30,13 @@
     :license: BSD, see LICENSE for more details.
 """
 
+from __future__ import annotations
+
 import re
 from abc import abstractmethod
 from typing import Any, AnyStr, Dict, Match, NewType, Optional, Pattern, Tuple
 
 FieldDict = NewType("FieldDict", Dict[str, Any])
-FormdDict = NewType("FormdDict", Dict[str, FieldDict])
 
 #: End of line with spaces or tabs before.
 EOL = r"[ \t]?$"
@@ -74,13 +75,20 @@ def _parse_range_args(s: str, typ):
 
 class _RegexField:
 
+    #: The regex pattern to match
     PATTERN: str = ""
+
+    #: The compiled regex pattern to match.
     REGEX: Pattern
+
+    @classmethod
+    def _preprocess_pattern(cls):
+        return cls.PATTERN
 
     def __init_subclass__(cls, **kwargs):
         super().__init_subclass__(**kwargs)
         if cls.PATTERN:
-            cls.REGEX = re.compile(cls.PATTERN, re.UNICODE)
+            cls.REGEX = re.compile(cls._preprocess_pattern(), re.UNICODE)
 
 
 class Field(_RegexField):
@@ -100,12 +108,19 @@ class Field(_RegexField):
 
     """
 
-    PATTERN = r"(?P<label>\w[\w \t\-]*)(?P<required>\*)?[ \t]*=(?P<pending>.*)"
+    PATTERN = (
+        r"(?P<label>\w[\w \t\-]*)(?P<required>\*)?[ \t]*=[ \t]*(?P<pending>.*)[ \t]*"
+        + EOL
+    )
 
     FIELD_TYPES = []
 
     @classmethod
     def match(cls, line: str) -> Optional[Tuple[str, FieldDict]]:
+        """Match a string containing (maybe) a form field with label.
+
+        Returns None if no field was match
+        """
         m = cls.REGEX.match(line)
         if not m:
             return None
@@ -127,7 +142,11 @@ class Field(_RegexField):
 
 
 class SpecificField(_RegexField):
-    """ "Base class for all specific fields."""
+    """Base class for all specific fields."""
+
+    @classmethod
+    def _preprocess_pattern(cls):
+        return "[ \t]*" + cls.PATTERN + "[ \t]*" + EOL
 
     def __init_subclass__(cls, **kwargs):
         super().__init_subclass__(**kwargs)
@@ -136,7 +155,9 @@ class SpecificField(_RegexField):
     @classmethod
     @abstractmethod
     def process(cls, m: Optional[Match[AnyStr]]) -> FieldDict:
-        pass
+        """Process a matched string. Usually you must subclass this
+        to produce
+        """
 
     @classmethod
     def match(cls, line: str) -> Optional[FieldDict]:
@@ -162,7 +183,7 @@ class SpecificField(_RegexField):
 class StringField(SpecificField):
     """Used to take single line input."""
 
-    PATTERN = r"[ \t]*___(\[(?P<length>\d*)\])?" + EOL
+    PATTERN = r"___(\[(?P<length>\d*)\])?"
 
     @classmethod
     def process(cls, m):
@@ -176,7 +197,7 @@ class StringField(SpecificField):
 class IntegerField(SpecificField):
     """Used to take single line input."""
 
-    REGEX = r"[ \t]*###(\[(?P<range>[\d:]*)\])?" + EOL
+    PATTERN = r"###(\[(?P<range>[\d:]*)\])?" + EOL
 
     @classmethod
     def process(cls, m):
@@ -191,7 +212,7 @@ class IntegerField(SpecificField):
 class FloatField(SpecificField):
     """Used to take single line input."""
 
-    REGEX = r"[ \t]*#\.#(\[(?P<range>[\d\.:]*)\])?" + EOL
+    PATTERN = r"#\.#(\[(?P<range>[\d\.:]*)\])?" + EOL
 
     @classmethod
     def process(cls, m):
@@ -206,7 +227,7 @@ class FloatField(SpecificField):
 class TextAreaField(SpecificField):
     """Used to take multi-line input."""
 
-    PATTERN = r"[ \t]*AAA(\[(?P<length>\d*)\])?" + EOL
+    PATTERN = r"AAA(\[(?P<length>\d*)\])?" + EOL
 
     @classmethod
     def process(cls, m):
@@ -223,7 +244,7 @@ class DateField(SpecificField):
     Currently, there is no way to specify the format.
     """
 
-    PATTERN = r"[ \t]d/m/y" + EOL
+    PATTERN = r"d/m/y"
 
     @classmethod
     def process(cls, m):
@@ -236,7 +257,7 @@ class TimeField(SpecificField):
     Currently, there is no way to specify the format.
     """
 
-    PATTERN = r"[ \t]hh:mm" + EOL
+    PATTERN = r"hh:mm"
 
     @classmethod
     def process(cls, m):
@@ -246,7 +267,7 @@ class TimeField(SpecificField):
 class EmailField(SpecificField):
     """A string field with email validation."""
 
-    PATTERN = r"[ \t]*@" + EOL
+    PATTERN = r"@"
 
     @classmethod
     def process(cls, m):
@@ -256,7 +277,7 @@ class EmailField(SpecificField):
 class RadioField(SpecificField):
     """Used to select among mutually exclusive inputs."""
 
-    PATTERN = r"[ \t]*(?P<content>\(x?\)[ \t]*[\w \t\-]+[\(\)\w \t\-]*)" + EOL
+    PATTERN = r"(?P<content>\(x?\)[ \t]*[\w \t\-]+[\(\)\w \t\-]*)"
 
     SUBREGEX = re.compile(
         r"\((?P<is_default>x?)\)[ \t]*(?P<label>[a-zA-Z0-9 \t_\-]?)", re.UNICODE
@@ -281,9 +302,7 @@ class RadioField(SpecificField):
 class CheckboxField(SpecificField):
     """Used to select among non-exclusive inputs."""
 
-    # REGEX = r"[ \t]*(\[x?\][ \t]*[\w \t\-]+[\[\]\w \t\-]*)"
-    REGEX = r"[ \t]*(?P<content>\[x?\][ \t]*[\w \t\-]+[\[\]\w \t\-]*)" + EOL
-    PATTERN = r"[ \t]*(\[x?\][ \t]*[\w \t\-]+[\[\]\w \t\-]*)"
+    PATTERN = r"(?P<content>\[x?\][ \t]*[\w \t\-]+[\[\]\w \t\-]*)"
     SUBREGEX = re.compile(
         r"\[(?P<is_default>x?)\][ \t]*(?P<label>[a-zA-Z0-9 \t_\-]?)", re.UNICODE
     )
@@ -307,7 +326,7 @@ class CheckboxField(SpecificField):
 class SelectField(SpecificField):
     """Used to select among mutually exclusive inputs, with a dropdown."""
 
-    PATTERN = r"[ \t]*\{(?P<content>([\w \t\->_,\(\)\[\]]+))\}"
+    PATTERN = r"\{(?P<content>([\w \t\->_,\(\)\[\]]+))\}"
 
     @classmethod
     def process(cls, m):
@@ -357,7 +376,7 @@ class SelectField(SpecificField):
 class FileField(SpecificField):
     """Used to upload a file."""
 
-    PATTERN = r"[ \t]*...(\[(?P<allowed>[\w \t,;]*)\])?" + EOL
+    PATTERN = r"...(\[(?P<allowed>[\w \t,;]*)\])?" + EOL
 
     @classmethod
     def process(cls, m):
