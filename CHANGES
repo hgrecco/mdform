@@ -4,7 +4,8 @@ mdform Changelog
 0.4 (unreleased)
 ----------------
 
-- Nothing changed yet.
+- Added typing information.
+- Reorganize code and base classes.
 
 
 0.3.1 (2021-04-25)
