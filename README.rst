@@ -40,7 +40,7 @@ This document:
 
 will generate the following html template:
 
-.. code-block:: text
+.. code-block:: html+jinja
 
     Please fill this form:
 
@@ -120,17 +120,17 @@ An optional email field (notice the `___` is now `@`):
 
 Each field is parsed into an object with the following attributes
 
-    - original_label: `str`, label as given in the markdown text.
-    - required: `bool`, indicate if the `*` was present.
-    - specific_field: `object`, describing the field in more detail
-      that might contain additional attributes.
+- original_label: `str`, label as given in the markdown text.
+- required: `bool`, indicate if the `*` was present.
+- specific_field: `object`, describing the field in more detail
+  that might contain additional attributes.
 
 Additionally, it has two properties:
 
-    - is_label_hidden: bool, indicates if `original_label` starts with `_`
-      which can be used downstream to indicate the label should not be displayed.
-    - label: str, a clean version of `original_label` in which `_` prefix has
-      been removed.
+- is_label_hidden: bool, indicates if `original_label` starts with `_`
+  which can be used downstream to indicate the label should not be displayed.
+- label: str, a clean version of `original_label` in which `_` prefix has
+  been removed.
 
 
 In the following lines, we will describe the syntax for each specific field.
@@ -368,6 +368,8 @@ In certain cases is useful to create a named section.
 
 will render as:
 
+.. code-block:: html+jinja
+
     {{ form.university_name }}
     {{ form.school_name }}
 
@@ -405,7 +407,7 @@ Sections are labeled from top to bottom without nesting. To remove a section nam
 
 will render as:
 
-.. code-block:: text
+.. code-block:: html+jinja
 
     {{ form.university_name }}
     {{ form.name }}
@@ -445,8 +447,38 @@ modifier `[o]`:
     [endcollapse]
 
 
+Syntax summary
+--------------
+
+::
+
+    Labeled field               <label> =
+    Labeled required field      <label>* =
+
+    Specific fields:
+        - StringField           ___[length]     (length is optional)
+        - IntegerField          ###[min:max:step]
+        - FloatField            #.#[min:max:step]
+        - TextAreaField         AAA[length]     (length is optional)
+        - DateField             d/m/y
+        - TimeField             hh:mm
+        - EmailField            @
+        - RadioField            (x) A () B      (the x is optional, defines a default choice)
+        - CheckboxField         [x] A [] B      (the x is optional, defines a default choice)
+        - SelectField           {(A), B}        (the parenthesis are optional, defines a default choice)
+        - FileField             ...[allowed]    (allowed is optional, extensions; description)
+
+    Organization:
+        - Section
+            [section:name]      name is a string which is prepended to the field names
+        - Collapsable part      control is the name of the field controlling open and close
+            [collapse:control]      of this part.
+            [endcollapse]           - Use [o] to indicate that selecting that option should open the part
+                                    - Use [c] to indicate that selecting that option should close the part
+
+
 Customizing HTML output
-~~~~~~~~~~~~~~~~~~~~~~~
+-----------------------
 
 The HTML field output can be fully customized by means of the formatter parameter.
 For example, if you want to generate a Mako_ template just do the following:
@@ -461,7 +493,7 @@ For example, if you want to generate a Mako_ template just do the following:
 
 will generate the following html template:
 
-.. code-block:: text
+.. code-block:: html+mako
 
     Please fill this form:
 
@@ -476,7 +508,7 @@ The formatter function must take two arguments: the variable name and the field 
 
 
 Combining with other MD extensions
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+----------------------------------
 
 If you need to integrate `mdform` an existing workflow with other extensions, just
 instantiate the markdown object as you normally do it and pass the `FormExtension`.
@@ -496,6 +528,8 @@ To customize the formatter:
 .. code-block:: python
 
     >>> md = Markdown(extensions = [FormExtension(formatter=mako_field_formatter), 'meta'])
+
+----
 
 See AUTHORS_ for a list of the maintainers.
 

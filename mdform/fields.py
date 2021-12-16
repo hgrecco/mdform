@@ -5,7 +5,7 @@
     Labeled field               <label> =
     Labeled required field      <label>* =
 
-    Fields:
+    Specific fields:
         - StringField           ___[length]     (length is optional)
         - IntegerField          ###[min:max:step]
         - FloatField            #.#[min:max:step]
