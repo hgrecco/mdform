@@ -1,3 +1,5 @@
+import pytest
+
 from mdform.fields import (
     CheckboxField,
     DateField,
@@ -15,13 +17,13 @@ from mdform.fields import (
 
 
 def test_label():
-    assert Field.match("name = @") == ("name", dict(type="EmailField", required=False))
-    assert Field.match("name* = @") == ("name", dict(type="EmailField", required=True))
-    assert Field.match("name * = @") == ("name", dict(type="EmailField", required=True))
-    assert Field.match("name* = AAA") == (
-        "name",
-        dict(type="TextAreaField", required=True, length=None),
-    )
+    assert Field.match("name = @") == ("name", False, EmailField())
+    assert Field.match("name* = @") == ("name", True, EmailField())
+    assert Field.match("name * = @") == ("name", True, EmailField())
+    assert Field.match("name* = AAA") == ("name", True, TextAreaField(length=None))
+
+    # No matched field
+    assert Field.match("name = XYZ") is None
 
 
 def test_string_field():
@@ -47,20 +49,21 @@ def test_integer_field():
     assert IntegerField.match("###[2]") == dict(min=None, max=2, step=None)
     assert IntegerField.match("###[0:2]") == dict(min=0, max=2, step=None)
     assert IntegerField.match("###[0:2:1]") == dict(min=0, max=2, step=1)
+    assert IntegerField.match("###[0::1]") == dict(min=0, max=None, step=1)
 
 
 def test_float_field():
-    # assert FloatField.match("") is None
-    # assert FloatField.match("#.#[]") is None
-    # assert FloatField.match("#.#[0:2:1:0]") is None
-    # assert FloatField.match("#.#[0:s:1]") is None
-    # assert FloatField.match("#.#[0:0.4:1]") is None
+    assert FloatField.match("") is None
+    assert FloatField.match("#.#[]") is None
+    assert FloatField.match("#.#[0:2:1:0]") is None
+    assert FloatField.match("#.#[0:s:1]") is None
 
     assert FloatField.match("#.#") == dict(min=None, max=None, step=None)
     assert FloatField.match("#.#[2]") == dict(min=None, max=2.0, step=None)
     assert FloatField.match("#.#[0:2]") == dict(min=0.0, max=2.0, step=None)
     assert FloatField.match("#.#[0:2:1]") == dict(min=0.0, max=2.0, step=1.0)
     assert FloatField.match("#.#[0:2:0.5]") == dict(min=0.0, max=2.0, step=0.5)
+    assert FloatField.match("#.#[0::0.5]") == dict(min=0.0, max=None, step=0.5)
 
 
 def test_area_field():
@@ -146,6 +149,16 @@ def test_select_field():
     assert SelectField.match("{ A[c]->J, B, (C->P)}") == dict(
         choices=(("A", "J"), ("B", "B"), ("C", "P")), default="C", collapse_on="A"
     )
+
+    assert SelectField.match("{ A, B[o], C}") == dict(
+        choices=(("A", "A"), ("B", "B"), ("C", "C")), default=None, collapse_on="~B"
+    )
+
+    with pytest.raises(ValueError):
+        assert SelectField.match("{ A, B[o], C[o]}")
+
+    with pytest.raises(ValueError):
+        assert SelectField.match("{ A, B[c], C[c]}")
 
 
 def test_filefield():

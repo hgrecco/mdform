@@ -1,4 +1,6 @@
-from mdform import FormExtension, Markdown
+import pytest
+
+from mdform import FormExtension, Markdown, fields
 
 TEXT = """
 Welcome to the form tester
@@ -25,6 +27,21 @@ This is colon collapsible
 [collapse:named]
 This is a named collapsible
 [endcollapse]
+
+[section:other_user]
+[collapse:other_named]
+This is a named collapsible
+[endcollapse]
+"""
+
+
+TEXT_DUP = """
+Welcome to the form tester
+
+name* = ___[30]
+
+name* = ___[30]
+
 """
 
 DEFAULT_FORMATTED = """<p>Welcome to the form tester</p>
@@ -44,38 +61,24 @@ This is colon collapsible
 
 <div id="accordion-named">
 This is a named collapsible
+</div>
+
+<div id="accordion-other_user_other_named">
+This is a named collapsible
 </div>"""
 
 
 FORM = {
-    "name": dict(
-        label="name", type="StringField", required=True, length=30, nolabel=False
+    "name": fields.Field("name", True, fields.StringField(length=30)),
+    "edad": fields.Field("_edad", False, fields.StringField(length=None)),
+    "e_mail": fields.Field("e-mail", True, fields.EmailField()),
+    "really_annoying_323_name": fields.Field(
+        "really annoying 323 name",
+        False,
+        fields.FileField(allowed=None, description=None),
     ),
-    "edad": dict(
-        label="edad",
-        type="StringField",
-        required=False,
-        length=None,
-        nolabel=True,
-    ),
-    "e_mail": dict(label="e-mail", type="EmailField", required=True, nolabel=False),
-    "really_annoying_323_name": dict(
-        label="really annoying 323 name",
-        type="FileField",
-        required=False,
-        allowed=None,
-        description=None,
-        nolabel=False,
-    ),
-    "user_name": dict(
-        label="name", type="StringField", required=True, length=None, nolabel=False
-    ),
-    "blip": dict(
-        label="blip",
-        type="EmailField",
-        required=True,
-        nolabel=False,
-    ),
+    "user_name": fields.Field("name", True, fields.StringField(length=None)),
+    "blip": fields.Field("blip", True, fields.EmailField()),
 }
 
 
@@ -89,3 +92,9 @@ def test_default_None():
     md = Markdown(extensions=[FormExtension(formatter=None)])
     assert md.convert(TEXT) == DEFAULT_FORMATTED
     assert md.mdform_definition == FORM
+
+
+def test_dup():
+    md = Markdown(extensions=[FormExtension(formatter=None)])
+    with pytest.raises(ValueError):
+        md.convert(TEXT_DUP)
