@@ -1,6 +1,6 @@
 import pytest
 
-from mdform import FormExtension, Markdown, fields
+from mdform import FormExtension, Markdown, fields, parse
 
 TEXT = """
 Welcome to the form tester
@@ -98,3 +98,14 @@ def test_dup():
     md = Markdown(extensions=[FormExtension(formatter=None)])
     with pytest.raises(ValueError):
         md.convert(TEXT_DUP)
+
+
+def test_parse():
+    assert parse(TEXT) == (DEFAULT_FORMATTED, FORM)
+
+
+def test_parse_other_format():
+    def fmt(variable_name, field) -> str:
+        return "{{ " + f"{variable_name}" + " }}"
+
+    assert parse(TEXT, formatter=fmt) == (DEFAULT_FORMATTED.replace("form.", ""), FORM)

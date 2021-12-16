@@ -8,10 +8,13 @@
     :license: BSD, see LICENSE for more details.
 """
 
+from typing import Dict, Tuple
+
 import pkg_resources
 from markdown import Markdown
 
 from .extension import FormExtension
+from .fields import Field
 
 try:  # pragma: no cover
     __version__ = pkg_resources.get_distribution("mdform").version
@@ -20,4 +23,12 @@ except Exception:  # pragma: no cover
     # so the reported version will be unknown
     __version__ = "unknown"
 
-__all__ = (FormExtension, __version__, Markdown)
+
+def parse(text: str, formatter=None) -> Tuple[str, Dict[str, Field]]:
+    md = Markdown(extensions=[FormExtension(formatter=formatter)])
+    html = md.convert(text)
+    form_def = md.mdform_definition
+    return html, form_def
+
+
+__all__ = (FormExtension, __version__, Markdown, parse)
