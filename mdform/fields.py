@@ -6,17 +6,17 @@
     Labeled required field      <label>* =
 
     Specific fields:
-        - StringField           ___[length]     (length is optional)
-        - IntegerField          ###[min:max:step]
-        - FloatField            #.#[min:max:step]
-        - TextAreaField         AAA[length]     (length is optional)
+        - StringField           ___[length]         (length is optional)
+        - IntegerField          ###[min:max:step]   (min, max, step are optional)
+        - FloatField            #.#[min:max:step]   (min, max, step are optional)
+        - TextAreaField         AAA[length]         (length is optional)
         - DateField             d/m/y
         - TimeField             hh:mm
         - EmailField            @
-        - RadioField            (x) A () B      (the x is optional, defines a default choice)
-        - CheckboxField         [x] A [] B      (the x is optional, defines a default choice)
-        - SelectField           {(A), B}        (the parenthesis are optional, defines a default choice)
-        - FileField             ...[allowed]    (allowed is optional, extensions; description)
+        - RadioField            (x) A () B          (the x is optional, defines a default choice)
+        - CheckboxField         [x] A [] B          (the x is optional, defines a default choice)
+        - SelectField           {(A), B}            (the parenthesis are optional, defines a default choice)
+        - FileField             ...[allowed]        (allowed is optional, extensions; description)
 
     Organization:
         - Section
