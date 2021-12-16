@@ -23,8 +23,7 @@
 mdform
 ======
 
-An extension for `python-markdown`_ to generate parse forms in Markdown
-based document.
+An extension for `python-markdown`_ to parse forms in a Markdown document.
 
 This document:
 
@@ -39,7 +38,7 @@ This document:
 
     Do you like this = () YES () NO
 
-will generate the following jinja template:
+will generate the following html template:
 
 .. code-block:: text
 
@@ -53,25 +52,30 @@ will generate the following jinja template:
     {{ form.do_you_like_this }}
 
 
-and this definition dictionary:
+and this form definition dictionary:
 
 .. code-block:: python
 
-    {'name': {'type': 'StringField',
-              'required': True,
-              'length': None
-              },
-     'email': {'type': 'EmailField',
-               'required': False
-              },
-     'do_you_like_this': {'type': 'OptionField',
-                          'required': False,
-                          'items': ('YES', 'NO'),
-                          'default': None
-                          }
+    {
+     'name':
+        Field(original_label='name',
+              required=True,
+              specific_field=StringField(length=None)
+             ),
+     'email':
+        Field(original_label='email',
+              required=False,
+              specific_field=EmailField()
+             ),
+     'do_you_like_this':
+        Field(original_label='Do you like this',
+              required=False,
+              specific_field=RadioField(choices=('Y', 'N'), default=None)
+              )
     }
 
-that you can consume to generate a form.
+
+that you can consume to generate a form. See how we use it in flask-mdform_
 
 Installation
 ------------
@@ -85,26 +89,51 @@ Usage
 
 .. code-block:: python
 
-    >>> from mdform import FormExtension, Markdown # Markdown is just re-exported from python-markdown
-    >>> md = Markdown(extensions = [FormExtension()])
-    >>> html = md.convert(text)           # this is the jinja template
-    >>> form_dict = md.mdform_definition  # this is the definition dict
-
-The html output will be a jinja2_ template and a dictionary describing
-the form (**mdform_definition**)
+    >>> import mdform
+    >>> html, form_definition = mdform.parse(text)
 
 
 Syntax
 ------
 
-The syntax is strongly based on this wmd_ fork.
+The syntax is strongly based on this wmd_ fork. Briefly, each field has
+a label, an optional flag to indicate if the field is required
+and, after the equal, the specification of the type of field
 
-All fields are parsed into a dictionary (**mdform_definition**). The keys are
-the form labels and the value is another dictionary with the following
-elements:
+For example, a required text field (notice the `*`):
 
-- type: str
-  (e.g. StringField, TextAreaField, etc)
+.. code-block:: text
+
+    name* = ___
+
+An optional text field (notice the lack of `*`):
+
+.. code-block:: text
+
+    name = ___
+
+An optional email field (notice the `___` is now `@`):
+
+.. code-block:: text
+
+    email = @
+
+Each field is parsed into an object with the following attributes
+
+    - original_label: `str`, label as given in the markdown text.
+    - required: `bool`, indicate if the `*` was present.
+    - specific_field: `object`, describing the field in more detail
+      that might contain additional attributes.
+
+Additionally, it has two properties:
+
+    - is_label_hidden: bool, indicates if `original_label` starts with `_`
+      which can be used downstream to indicate the label should not be displayed.
+    - label: str, a clean version of `original_label` in which `_` prefix has
+      been removed.
+
+
+In the following lines, we will describe the syntax for each specific field.
 
 
 Text fields (StringField)
@@ -128,7 +157,7 @@ Customizing:
 
     name = ___[length]
 
-Specific dict values:
+Specific field attributes:
 
 - length : int or None (default)
 
@@ -156,7 +185,7 @@ Customizing:
 
 The `range` is parsed like a numpy range.
 
-Specific dict values:
+Specific field attributes:
 
 - min : int or None (default)
 - max : int or None (default)
@@ -186,7 +215,7 @@ Customizing:
 
 The `range` is parsed like a numpy range.
 
-Specific dict values:
+Specific field attributes:
 
 - min : float or None (default)
 - max : float or None (default)
@@ -214,7 +243,7 @@ Customizing:
 
     name = ___[length]
 
-Specific dict values:
+Specific field attributes:
 
 - length : int or None (default)
 
@@ -228,7 +257,7 @@ Radio buttons (RadioField)
 
 Optionally, an `x` can be used to indicate the default value.
 
-Specific dict values:
+Specific field attributes:
 
 - values : tuple of str
 - default : str
@@ -243,7 +272,7 @@ Check boxes (CheckboxField)
 
 Optionally, an `x` can be used to indicate the default values.
 
-Specific dict values:
+Specific field attributes:
 
 - values : tuple of strings
 - default : tuple of str
@@ -268,7 +297,7 @@ Or with user-friendly labels:
 
 The option in parenthesis will be the default.
 
-Specific dict values:
+Specific field attributes:
 
 - choices : tuple of (str, str) (key, value)
 - default : str
@@ -300,7 +329,7 @@ or:
     name = ...[png,jpg;Only image files]
 
 
-Specific dict values:
+Specific field attributes:
 
 - allowed : tuple of str
 - description : str
@@ -320,22 +349,6 @@ Time Field (TimeField)
 .. code-block:: text
 
     name = hh:mm
-
-
-
-Required fields
-~~~~~~~~~~~~~~~
-
-To flag a field as required, just add an asterisk after the name.
-
-.. code-block:: text
-
-    zip code* = ___
-
-
-Specific dict values:
-
-- required: bool
 
 
 Sections
@@ -358,21 +371,27 @@ will render as:
     {{ form.university_name }}
     {{ form.school_name }}
 
-and:
+and the form definition dictionary:
 
 .. code-block:: python
 
-    {'university_name': {'type': 'StringField',
-                         'required': True,
-                         'length': None
-                         },
-     'school_name': {'type': 'StringField',
-                     'required': True,
-                     'length': None
-                     }
+    {
+     'university_name':
+        Field(original_label='name',
+              required=True,
+              specific_field=StringField(length=None)
+             ),
+     'school_name':
+        Field(original_label='name',
+              required=True,
+              specific_field=StringField(length=None)
+             ),
     }
 
-Sections are labeled from top to bottom, no remove a section name just do it this way.
+Notice that the key in the form definition dictionary (referred in the code as `variable_name`)
+is not just the label: it now contains the section name allowing multiple field with the same label.
+
+Sections are labeled from top to bottom without nesting. To remove a section name just do it this way.
 
 .. code-block:: text
 
@@ -412,6 +431,71 @@ shown:
 
 The `extra` in the `collapse` tag indicates which dropdown box is used as control.
 
+Alternative, you can specify in which option to open a collapsable part with the
+modifier `[o]`:
+
+.. code-block:: text
+
+    extra = {Yes[o], (No)}
+
+    [collapse:extra]
+
+    name = ___
+
+    [endcollapse]
+
+
+Customizing HTML output
+~~~~~~~~~~~~~~~~~~~~~~~
+
+The HTML field output can be fully customized by means of the formatter parameter.
+For example, if you want to generate a Mako_ template just do the following:
+
+.. code-block:: python
+
+    >>> def mako_field_formatter(variable_name, field):
+            return "${ " + f"form.{variable_name}" + " }"
+    >>>
+    >>> import mdform
+    >>> html, form_definition = mdform.parse(text)
+
+will generate the following html template:
+
+.. code-block:: text
+
+    Please fill this form:
+
+    ${ form.name }
+    ${ form.email }
+
+    And also this important question:
+
+    ${ form.do_you_like_this }
+
+The formatter function must take two arguments: the variable name and the field object.
+
+
+Combining with other MD extensions
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If you need to integrate `mdform` an existing workflow with other extensions, just
+instantiate the markdown object as you normally do it and pass the `FormExtension`.
+For example, here I am combining `mdform` with the meta_ extension.
+
+.. code-block:: python
+
+    >>> from mdform import FormExtension, Markdown # Markdown is just re-exported from python-markdown
+    >>> md = Markdown(extensions = [FormExtension(), 'meta'])
+    >>> html = md.convert(text)           # this is the jinja template
+    >>> form_def = md.mdform_definition   # this is the form definition
+
+The form definition dict is now accesible through `mdform_definition` attribute of the markdown object
+
+To customize the formatter:
+
+.. code-block:: python
+
+    >>> md = Markdown(extensions = [FormExtension(formatter=mako_field_formatter), 'meta'])
 
 See AUTHORS_ for a list of the maintainers.
 
@@ -424,3 +508,7 @@ see CHANGES_
 .. _`AUTHORS`: https://github.com/hgrecco/mdform/blob/master/AUTHORS
 .. _`CHANGES`: https://github.com/hgrecco/mdform/blob/master/CHANGES
 .. _jinja2: https://jinja.palletsprojects.com/
+.. _flask-mdform: https://github.com/hgrecco/flask-mdform
+.. _django: https://www.djangoproject.com/
+.. _Mako: https://www.makotemplates.org/
+.. _meta: https://python-markdown.github.io/extensions/meta_data/
