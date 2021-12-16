@@ -165,7 +165,8 @@ class Field(_RegexField):
 
     @classmethod
     def from_str(cls, s: str) -> Field:
-        if (m := cls.match(s)) is not None:
+        m = cls.match(s)
+        if m is not None:
             label, required, spefic_field = m
             return cls(label, required, spefic_field)
         raise ValueError("Could not match labeled field")
