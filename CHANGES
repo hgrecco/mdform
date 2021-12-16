@@ -4,7 +4,9 @@ mdform Changelog
 0.5 (unreleased)
 ----------------
 
-- Nothing changed yet.
+- Migrated fields to use dataclasses
+- Added typing information
+- Improved testing and coverage
 
 
 0.4 (2021-12-09)
