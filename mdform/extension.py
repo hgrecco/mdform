@@ -17,7 +17,7 @@ import unidecode
 from markdown.extensions import Extension
 from markdown.preprocessors import Preprocessor
 
-from .fields import COLLAPSE_CLOSE_RE, COLLAPSE_OPEN_RE, SECTION_RE, Field, FieldDict
+from .fields import COLLAPSE_CLOSE_RE, COLLAPSE_OPEN_RE, SECTION_RE, Field
 
 COLLAPSE_OPEN_HTML = r'<div id="accordion-%s">'
 COLLAPSE_CLOSE_HTML = r"</div>"
@@ -48,15 +48,15 @@ def default_label_sanitizer(s: str) -> str:
     return s
 
 
-def default_field_formatter(variable_name: str, variable_dict: FieldDict) -> str:
+def default_field_formatter(variable_name: str, field: Field) -> str:
     """Default form field formatter.
 
     Parameters
     ----------
     variable_name : str
         field name.
-    variable_dict : FieldDict
-        definition dictionary of the field.
+    field : Field
+        definition of the field.
 
     Returns
     -------
@@ -85,7 +85,7 @@ class FormPreprocessor(Preprocessor):
     """
 
     # dictionary mapping labels to
-    mdform_definition: Dict[str, FieldDict] = {}
+    mdform_definition: Dict[str, Field] = {}
 
     def __init__(self, md, sanitizer=None, formatter=default_field_formatter):
         self.sanitizer = sanitizer or (lambda s: s)
@@ -126,28 +126,25 @@ class FormPreprocessor(Preprocessor):
                 out.append(COLLAPSE_CLOSE_HTML)
                 continue
 
-            label_value = Field.match(line)
+            try:
+                field = Field.from_str(line)
+            except ValueError:
+                out.append(line)
+                continue
 
-            if label_value:
-                label, value = label_value
+            variable_name = self.sanitizer(field.label.lower())
 
-                nolabel = False
-                if label.startswith("_"):
-                    label = label[1:]
-                    nolabel = True
+            if section:
+                variable_name = "%s_%s" % (section, variable_name)
 
-                variable_name = self.sanitizer(label.lower())
-
-                if section:
-                    variable_name = "%s_%s" % (section, variable_name)
-
-                form[variable_name] = variable_dict = dict(
-                    label=label, nolabel=nolabel, **value
+            if variable_name in form:
+                raise ValueError(
+                    f"Duplicate variable name found in form: {variable_name}"
                 )
 
-                out.append(self.formatter(variable_name, variable_dict))
-            else:
-                out.append(line)
+            form[variable_name] = field
+
+            out.append(self.formatter(variable_name, field))
 
         self.md.mdform_definition = form
         return out
@@ -182,4 +179,4 @@ class FormExtension(Extension):
 
 
 def makeExtension(**kwargs):
-    return FormExtension(**kwargs)
+    return FormExtension(**kwargs)  # pragma: no cover
