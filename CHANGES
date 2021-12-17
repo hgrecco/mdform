@@ -1,8 +1,8 @@
 mdform Changelog
 ================
 
-0.6 (unreleased)
-----------------
+0.5.1 (2021-12-16)
+------------------
 
 - Add parse convenience function.
 - Improve docs.
