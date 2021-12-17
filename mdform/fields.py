@@ -26,7 +26,7 @@
             [endcollapse]           - Use [o] to indicate that selecting that option should open the part
                                     - Use [c] to indicate that selecting that option should close the part
 
-    :copyright: 2020 by mdform Authors, see AUTHORS for more details.
+    :copyright: 2021 by mdform Authors, see AUTHORS for more details.
     :license: BSD, see LICENSE for more details.
 """
 
