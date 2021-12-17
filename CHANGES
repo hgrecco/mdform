@@ -4,7 +4,8 @@ mdform Changelog
 0.6 (unreleased)
 ----------------
 
-- Nothing changed yet.
+- Add parse convenience function.
+- Improve docs.
 
 
 0.5 (2021-12-16)
