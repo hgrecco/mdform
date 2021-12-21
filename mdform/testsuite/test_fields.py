@@ -3,6 +3,7 @@ import pytest
 from mdform.fields import (
     CheckboxField,
     DateField,
+    DecimalField,
     EmailField,
     Field,
     FileField,
@@ -69,6 +70,42 @@ def test_integer_field():
     assert f.specific_field.min == 0
     assert f.specific_field.max == 2
     assert f.specific_field.step == 1
+
+
+def test_decimal_field():
+    assert DecimalField.match("") is None
+    assert DecimalField.match("#.#[]") is None
+    assert DecimalField.match("#.#[0:s:1]") is None
+    assert DecimalField.match("#.#[0:0:1:0:0]") is None
+
+    assert DecimalField.match("#.#") == dict(min=None, max=None, step=None, places=2)
+    assert DecimalField.match("#.#[2]") == dict(min=None, max=2.0, step=None, places=2)
+    assert DecimalField.match("#.#[0:2]") == dict(min=0.0, max=2.0, step=None, places=2)
+    assert DecimalField.match("#.#[0:2:1]") == dict(
+        min=0.0, max=2.0, step=1.0, places=2
+    )
+    assert DecimalField.match("#.#[0:2:0.5]") == dict(
+        min=0.0, max=2.0, step=0.5, places=2
+    )
+    assert DecimalField.match("#.#[0::0.5]") == dict(
+        min=0.0, max=None, step=0.5, places=2
+    )
+    assert DecimalField.match("#.#[0::0.5:3]") == dict(
+        min=0.0, max=None, step=0.5, places=3
+    )
+
+    f = Field.from_str("name = #.#")
+    assert isinstance(f.specific_field, DecimalField)
+    assert f.specific_field.min is None
+    assert f.specific_field.max is None
+    assert f.specific_field.step is None
+
+    f = Field.from_str("name = #.#[0:2:1:3]")
+    assert isinstance(f.specific_field, DecimalField)
+    assert f.specific_field.min == 0
+    assert f.specific_field.max == 2
+    assert f.specific_field.step == 1
+    assert f.specific_field.places == 3
 
 
 def test_float_field():

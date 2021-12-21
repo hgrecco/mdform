@@ -8,7 +8,8 @@
     Specific fields:
         - StringField           ___[length]         (length is optional)
         - IntegerField          ###[min:max:step]   (min, max, step are optional)
-        - FloatField            #.#[min:max:step]   (min, max, step are optional)
+        - DecimalField          #.#[min:max:step:places]   (min, max, step, places are optional)
+        - FloatField            #.#f[min:max:step]   (min, max, step are optional)
         - TextAreaField         AAA[length]         (length is optional)
         - DateField             d/m/y
         - TimeField             hh:mm
@@ -77,6 +78,30 @@ def _parse_range_args(s: str, typ):
         return s[0], s[1], None
     elif len(s) == 3:
         return s[0], s[1], s[2]
+
+    raise ValueError
+
+
+def _parse_range_round_args(s: str, typ):
+
+    if s is None:
+        return None, None, None, 2
+
+    s = s.lower().strip()
+
+    if s is None or s == "":
+        raise ValueError
+
+    s = [_parse_or_none(el, typ) for el in s.split(":")]
+
+    if len(s) == 1:
+        return None, s[0], None, 2
+    elif len(s) == 2:
+        return s[0], s[1], None, 2
+    elif len(s) == 3:
+        return s[0], s[1], s[2], 2
+    elif len(s) == 4:
+        return s[0], s[1], s[2], s[3]
 
     raise ValueError
 
@@ -235,8 +260,8 @@ class IntegerField(SpecificField):
 
     _PATTERN = r"###(\[(?P<range>[\d:]*)\])?"
 
-    mn: Optional[int] = None
-    mx: Optional[int] = None
+    min: Optional[int] = None
+    max: Optional[int] = None
     step: Optional[int] = None
 
     @classmethod
@@ -250,13 +275,34 @@ class IntegerField(SpecificField):
 
 
 @dataclass(frozen=True)
-class FloatField(SpecificField):
-    """Used to take single float input."""
+class DecimalField(SpecificField):
+    """Used to take single decimal input."""
 
     _PATTERN = r"#\.#(\[(?P<range>[\d\.:]*)\])?"
 
-    mn: Optional[float] = None
-    mx: Optional[float] = None
+    min: Optional[float] = None
+    max: Optional[float] = None
+    step: Optional[float] = None
+    places: Optional[int] = 2
+
+    @classmethod
+    def process(cls, m):
+        try:
+            mn, mx, step, places = _parse_range_round_args(m.group("range"), float)
+        except Exception:
+            return None
+
+        return dict(min=mn, max=mx, step=step, places=places)
+
+
+@dataclass(frozen=True)
+class FloatField(SpecificField):
+    """Used to take single float input."""
+
+    _PATTERN = r"#\.#f(\[(?P<range>[\d\.:]*)\])?"
+
+    min: Optional[float] = None
+    max: Optional[float] = None
     step: Optional[float] = None
 
     @classmethod
