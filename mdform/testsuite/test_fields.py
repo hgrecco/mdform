@@ -37,6 +37,13 @@ def test_string_field():
     assert StringField.match(" ___[30] ") == dict(length=30)
     assert StringField.match("___[]") == dict(length=None)
 
+    f = Field.from_str("name = ___[]")
+    assert isinstance(f.specific_field, StringField)
+    assert f.specific_field.length is None
+    f = Field.from_str("name = ___[30]")
+    assert isinstance(f.specific_field, StringField)
+    assert f.specific_field.length == 30
+
 
 def test_integer_field():
     assert IntegerField.match("") is None
@@ -51,19 +58,43 @@ def test_integer_field():
     assert IntegerField.match("###[0:2:1]") == dict(min=0, max=2, step=1)
     assert IntegerField.match("###[0::1]") == dict(min=0, max=None, step=1)
 
+    f = Field.from_str("name = ###")
+    assert isinstance(f.specific_field, IntegerField)
+    assert f.specific_field.min is None
+    assert f.specific_field.max is None
+    assert f.specific_field.step is None
+
+    f = Field.from_str("name = ###[0:2:1]")
+    assert isinstance(f.specific_field, IntegerField)
+    assert f.specific_field.min == 0
+    assert f.specific_field.max == 2
+    assert f.specific_field.step == 1
+
 
 def test_float_field():
     assert FloatField.match("") is None
-    assert FloatField.match("#.#[]") is None
-    assert FloatField.match("#.#[0:2:1:0]") is None
-    assert FloatField.match("#.#[0:s:1]") is None
+    assert FloatField.match("#.#f[]") is None
+    assert FloatField.match("#.#f[0:2:1:0]") is None
+    assert FloatField.match("#.#f[0:s:1]") is None
 
-    assert FloatField.match("#.#") == dict(min=None, max=None, step=None)
-    assert FloatField.match("#.#[2]") == dict(min=None, max=2.0, step=None)
-    assert FloatField.match("#.#[0:2]") == dict(min=0.0, max=2.0, step=None)
-    assert FloatField.match("#.#[0:2:1]") == dict(min=0.0, max=2.0, step=1.0)
-    assert FloatField.match("#.#[0:2:0.5]") == dict(min=0.0, max=2.0, step=0.5)
-    assert FloatField.match("#.#[0::0.5]") == dict(min=0.0, max=None, step=0.5)
+    assert FloatField.match("#.#f") == dict(min=None, max=None, step=None)
+    assert FloatField.match("#.#f[2]") == dict(min=None, max=2.0, step=None)
+    assert FloatField.match("#.#f[0:2]") == dict(min=0.0, max=2.0, step=None)
+    assert FloatField.match("#.#f[0:2:1]") == dict(min=0.0, max=2.0, step=1.0)
+    assert FloatField.match("#.#f[0:2:0.5]") == dict(min=0.0, max=2.0, step=0.5)
+    assert FloatField.match("#.#f[0::0.5]") == dict(min=0.0, max=None, step=0.5)
+
+    f = Field.from_str("name = #.#f")
+    assert isinstance(f.specific_field, FloatField)
+    assert f.specific_field.min is None
+    assert f.specific_field.max is None
+    assert f.specific_field.step is None
+
+    f = Field.from_str("name = #.#f[0:2:1]")
+    assert isinstance(f.specific_field, FloatField)
+    assert f.specific_field.min == 0
+    assert f.specific_field.max == 2
+    assert f.specific_field.step == 1
 
 
 def test_area_field():
@@ -77,12 +108,22 @@ def test_area_field():
     assert TextAreaField.match(" AAA[30] ") == dict(length=30)
     assert TextAreaField.match("AAA[]") == dict(length=None)
 
+    f = Field.from_str("name = AAA[]")
+    assert isinstance(f.specific_field, TextAreaField)
+    assert f.specific_field.length is None
+    f = Field.from_str("name = AAA[30]")
+    assert isinstance(f.specific_field, TextAreaField)
+    assert f.specific_field.length == 30
+
 
 def test_date_field():
     assert DateField.match("") is None
     assert DateField.match("d/m/y") == dict()
     assert DateField.match(" d/m/y") == dict()
     assert DateField.match(" d/m/y ") == dict()
+
+    f = Field.from_str("name = d/m/y")
+    assert isinstance(f.specific_field, DateField)
 
 
 def test_time_field():
@@ -91,12 +132,18 @@ def test_time_field():
     assert TimeField.match(" hh:mm") == dict()
     assert TimeField.match(" hh:mm ") == dict()
 
+    f = Field.from_str("name = hh:mm")
+    assert isinstance(f.specific_field, TimeField)
+
 
 def test_email_field():
     assert EmailField.match("") is None
     assert EmailField.match("@") == dict()
     assert EmailField.match(" @") == dict()
     assert EmailField.match(" @ ") == dict()
+
+    f = Field.from_str("name = @")
+    assert isinstance(f.specific_field, EmailField)
 
 
 def test_checkbox_field():
@@ -200,6 +247,12 @@ def test_select_field():
     with pytest.raises(ValueError):
         assert SelectField.match("{ A, B[c], C[c]}")
 
+    f = Field.from_str("name = { A, B[c], C}")
+    assert isinstance(f.specific_field, SelectField)
+    assert f.specific_field.choices == (("A", "A"), ("B", "B"), ("C", "C"))
+    assert f.specific_field.default is None
+    assert f.specific_field.collapse_on == "B"
+
 
 def test_filefield():
     assert FileField.match("") is None
@@ -214,3 +267,8 @@ def test_filefield():
     assert FileField.match("...[png,jpg;image files only]") == dict(
         allowed=("png", "jpg"), description="image files only"
     )
+
+    f = Field.from_str("name = ...[png,jpg;image files only]")
+    assert isinstance(f.specific_field, FileField)
+    assert f.specific_field.allowed == ("png", "jpg")
+    assert f.specific_field.description == "image files only"
