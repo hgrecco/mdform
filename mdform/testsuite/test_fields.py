@@ -114,6 +114,20 @@ def test_checkbox_field():
         choices=("A", "B", "C"), default=tuple()
     )
 
+    assert CheckboxField.match("[] Apple [] Banana [] Coconut") == dict(
+        choices=("Apple", "Banana", "Coconut"), default=tuple()
+    )
+
+    f = Field.from_str("name = [] A [] B [] C")
+    assert isinstance(f.specific_field, CheckboxField)
+    assert f.specific_field.choices == ("A", "B", "C")
+    assert f.specific_field.default == tuple()
+
+    f = Field.from_str("name = [] A [x] B [] C")
+    assert isinstance(f.specific_field, CheckboxField)
+    assert f.specific_field.choices == ("A", "B", "C")
+    assert f.specific_field.default == ("B",)
+
 
 def test_radio_field():
     assert RadioField.match("") is None
@@ -126,6 +140,20 @@ def test_radio_field():
     assert RadioField.match("() A () B () C") == dict(
         choices=("A", "B", "C"), default=None
     )
+
+    assert RadioField.match("() Apple () Banana () Coconut") == dict(
+        choices=("Apple", "Banana", "Coconut"), default=None
+    )
+
+    f = Field.from_str("name = () A () B () C")
+    assert isinstance(f.specific_field, RadioField)
+    assert f.specific_field.choices == ("A", "B", "C")
+    assert f.specific_field.default is None
+
+    f = Field.from_str("name = () A (x) B () C")
+    assert isinstance(f.specific_field, RadioField)
+    assert f.specific_field.choices == ("A", "B", "C")
+    assert f.specific_field.default == "B"
 
 
 def test_select_field():
@@ -152,6 +180,18 @@ def test_select_field():
 
     assert SelectField.match("{ A, B[o], C}") == dict(
         choices=(("A", "A"), ("B", "B"), ("C", "C")), default=None, collapse_on="~B"
+    )
+
+    assert SelectField.match("{ Apple, Banana, Coconut}") == dict(
+        choices=(("Apple", "Apple"), ("Banana", "Banana"), ("Coconut", "Coconut")),
+        default=None,
+        collapse_on=None,
+    )
+
+    assert SelectField.match("{ Apple->Jelly, Banana, Coconut->Pear}") == dict(
+        choices=(("Apple", "Jelly"), ("Banana", "Banana"), ("Coconut", "Pear")),
+        default=None,
+        collapse_on=None,
     )
 
     with pytest.raises(ValueError):

@@ -332,7 +332,7 @@ class RadioField(SpecificField):
     _PATTERN = r"(?P<content>\(x?\)[ \t]*[\w \t\-]+[\(\)\w \t\-]*)"
 
     _SUB_REGEX = re.compile(
-        r"\((?P<is_default>x?)\)[ \t]*(?P<label>[a-zA-Z0-9 \t_\-]?)", re.UNICODE
+        r"\((?P<is_default>x?)\)[ \t]*(?P<label>[a-zA-Z0-9 \t_\-]*)", re.UNICODE
     )
 
     choices: tuple[str, ...]
@@ -360,7 +360,7 @@ class CheckboxField(SpecificField):
 
     _PATTERN = r"(?P<content>\[x?\][ \t]*[\w \t\-]+[\[\]\w \t\-]*)"
     _SUB_REGEX = re.compile(
-        r"\[(?P<is_default>x?)\][ \t]*(?P<label>[a-zA-Z0-9 \t_\-]?)", re.UNICODE
+        r"\[(?P<is_default>x?)\][ \t]*(?P<label>[a-zA-Z0-9 \t_\-]*)", re.UNICODE
     )
 
     choices: tuple[str, ...]
