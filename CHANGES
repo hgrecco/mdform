@@ -4,7 +4,13 @@ mdform Changelog
 0.6 (unreleased)
 ----------------
 
-- Nothing changed yet.
+- Fixed bug in FloatField defining min, max or step.
+- Changed FloatField representation to #.#f[min:max:step]
+  (notice the trailing f).
+- Added DecimalField with representation #.#[min:max:step:places].
+- Added tests for Fields.
+- Fixed parsing bug in RadioField / CheckBoxField for labels with
+  more than 1 letter.
 
 
 0.5.1 (2021-12-16)

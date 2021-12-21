@@ -197,21 +197,21 @@ Float fields (FloatField)
 
 .. code-block:: text
 
-    value = #.#
+    value = #.#f
 
 or:
 
 .. code-block:: text
 
-    value = #.#[0:2:0.5]
+    value = #.#f[0:2:0.5]
 
-Exactly 3 numeral will be matched. Any more will be handled as standard directives.
+Exactly 3 numbers will be matched. Any more will be handled as standard directives.
 
 Customizing:
 
 .. code-block:: text
 
-    value = #.#[range]
+    value = #.#f[range]
 
 The `range` is parsed like a numpy range.
 
@@ -221,6 +221,37 @@ Specific field attributes:
 - max : float or None (default)
 - step : float or None (default)
 
+
+Decimal fields (DecimalField)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: text
+
+    value = #.#
+
+or:
+
+.. code-block:: text
+
+    value = #.#[0:2:0.5:1]
+
+Exactly 4 numbers will be matched. Any more will be handled as standard directives.
+
+Customizing:
+
+.. code-block:: text
+
+    value = #.#[range:places]
+
+The `range` is parsed like a numpy range. The last (fourth position)
+is always the place
+
+Specific field attributes:
+
+- min : float or None (default)
+- max : float or None (default)
+- step : float or None (default)
+- step : int  (default = 2)
 
 Text area (TextAreaField)
 ~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -458,7 +489,8 @@ Syntax summary
     Specific fields:
         - StringField           ___[length]         (length is optional)
         - IntegerField          ###[min:max:step]   (min, max, step are optional)
-        - FloatField            #.#[min:max:step]   (min, max, step are optional)
+        - DecimalField          #.#[min:max:step:places]   (min, max, step, places are optional)
+        - FloatField            #.#f[min:max:step]   (min, max, step are optional)
         - TextAreaField         AAA[length]         (length is optional)
         - DateField             d/m/y
         - TimeField             hh:mm
