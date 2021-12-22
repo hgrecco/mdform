@@ -95,7 +95,7 @@ class FormPreprocessor(Preprocessor):
         super().__init__(md)
 
     def run(self, lines):
-        """ Parse Form and store in Markdown.Form. """
+        """Parse Form and store in Markdown.Form."""
         unnamed_collapese_cnt = 0
         form = {}
         section = None
