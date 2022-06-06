@@ -1,4 +1,3 @@
 [run]
 source = mdform
 omit = mdform/testsuite/*
-
