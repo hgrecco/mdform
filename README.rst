@@ -10,9 +10,13 @@
     :target: https://pypi.python.org/pypi/mdform
     :alt: Python Versions
 
-.. image:: https://travis-ci.org/hgrecco/mdform.svg?branch=master
-    :target: https://travis-ci.org/hgrecco/mdform
+.. image:: https://github.com/hgrecco/mdform/workflows/CI/badge.svg
+    :target: https://github.com/hgrecco/mdform/actions?query=workflow%3ACI
     :alt: CI
+
+.. image:: https://github.com/hgrecco/mdform/workflows/Lint/badge.svg
+    :target: https://github.com/hgrecco/mdform/actions?query=workflow%3ALint
+    :alt: LINTER
 
 .. image:: https://coveralls.io/repos/github/hgrecco/mdform/badge.svg?branch=master
     :target: https://coveralls.io/github/hgrecco/mdform?branch=master
