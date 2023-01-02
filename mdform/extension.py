@@ -5,7 +5,7 @@
     An extension for `python-markdown`_ to generate parse forms
     in Markdown based document.
 
-    :copyright: 2021 by mdform Authors, see AUTHORS for more details.
+    :copyright: 2023 by mdform Authors, see AUTHORS for more details.
     :license: BSD, see LICENSE for more details.
 """
 
