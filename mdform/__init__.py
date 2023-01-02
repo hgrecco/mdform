@@ -27,7 +27,7 @@ except Exception:  # pragma: no cover
     __version__ = "unknown"
 
 
-def parse(text: str, formatter=None) -> Tuple[str, Dict[str, Field]]:
+def parse(text: str, formatter=None) -> tuple[str, dict[str, Field]]:
     md = Markdown(extensions=[FormExtension(formatter=formatter)])
     html = md.convert(text)
     form_def = md.mdform_definition

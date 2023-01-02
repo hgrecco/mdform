@@ -12,7 +12,6 @@
 from __future__ import annotations
 
 import re
-from typing import Dict
 
 import unidecode
 from markdown.extensions import Extension
@@ -86,7 +85,7 @@ class FormPreprocessor(Preprocessor):
     """
 
     # dictionary mapping labels to
-    mdform_definition: Dict[str, Field] = {}
+    mdform_definition: dict[str, Field] = {}
 
     def __init__(self, md, sanitizer=None, formatter=default_field_formatter):
         self.sanitizer = sanitizer or (lambda s: s)
@@ -117,7 +116,7 @@ class FormPreprocessor(Preprocessor):
                     control_field = str(unnamed_collapese_cnt)
                     unnamed_collapese_cnt += 1
                 if section:
-                    control_field = "%s_%s" % (section, control_field)
+                    control_field = "{}_{}".format(section, control_field)
 
                 out.append(COLLAPSE_OPEN_HTML % control_field)
                 continue
@@ -136,7 +135,7 @@ class FormPreprocessor(Preprocessor):
             variable_name = self.sanitizer(field.label.lower())
 
             if section:
-                variable_name = "%s_%s" % (section, variable_name)
+                variable_name = "{}_{}".format(section, variable_name)
 
             if variable_name in form:
                 raise ValueError(

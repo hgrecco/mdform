@@ -50,7 +50,7 @@ import re
 import typing
 from abc import abstractmethod
 from dataclasses import dataclass
-from typing import Any, AnyStr, Dict, Match, Optional, Pattern, Tuple
+from typing import Any, AnyStr, Match, Pattern
 
 from dataclass_wizard import JSONWizard
 
@@ -186,7 +186,7 @@ class Field(_RegexField):
         return self.original_label
 
     @classmethod
-    def match(cls, s: str) -> Optional[Tuple[str, bool, SpecificField]]:
+    def match(cls, s: str) -> tuple[str, bool, SpecificField] | None:
         """Match a string containing (maybe) a form field with label.
 
         Returns None if no field was match
@@ -230,13 +230,13 @@ class SpecificField(_RegexField):
 
     @classmethod
     @abstractmethod
-    def process(cls, m: Optional[Match[AnyStr]]) -> Dict[str, Any]:
+    def process(cls, m: Match[AnyStr] | None) -> dict[str, Any]:
         """Process a matched string. Usually you must subclass this
         to produce
         """
 
     @classmethod
-    def match(cls, line: str) -> Optional[Dict[str, Any]]:
+    def match(cls, line: str) -> dict[str, Any] | None:
         """Try to match the pattern to the provided s.
 
         Parameters
@@ -263,7 +263,7 @@ class StringField(SpecificField):
 
     _PATTERN = r"___(\[(?P<length>\d*)\])?"
 
-    length: Optional[int]
+    length: int | None
 
     @classmethod
     def process(cls, m):
@@ -280,9 +280,9 @@ class IntegerField(SpecificField):
 
     _PATTERN = r"###(\[(?P<range>[\d:]*)\])?"
 
-    min: Optional[int] = None
-    max: Optional[int] = None
-    step: Optional[int] = None
+    min: int | None = None
+    max: int | None = None
+    step: int | None = None
 
     @classmethod
     def process(cls, m):
@@ -300,10 +300,10 @@ class DecimalField(SpecificField):
 
     _PATTERN = r"#\.#(\[(?P<range>[\d\.:]*)\])?"
 
-    min: Optional[float] = None
-    max: Optional[float] = None
-    step: Optional[float] = None
-    places: Optional[int] = 2
+    min: float | None = None
+    max: float | None = None
+    step: float | None = None
+    places: int | None = 2
 
     @classmethod
     def process(cls, m):
@@ -321,9 +321,9 @@ class FloatField(SpecificField):
 
     _PATTERN = r"#\.#f(\[(?P<range>[\d\.:]*)\])?"
 
-    min: Optional[float] = None
-    max: Optional[float] = None
-    step: Optional[float] = None
+    min: float | None = None
+    max: float | None = None
+    step: float | None = None
 
     @classmethod
     def process(cls, m):
@@ -341,7 +341,7 @@ class TextAreaField(SpecificField):
 
     _PATTERN = r"AAA(\[(?P<length>\d*)\])?"
 
-    length: Optional[int] = None
+    length: int | None = None
 
     @classmethod
     def process(cls, m):
@@ -509,8 +509,8 @@ class FileField(SpecificField):
 
     _PATTERN = r"\.\.\.(\[(?P<allowed>[\w \t,;]*)\])?"
 
-    allowed: Optional[tuple[str, ...]]
-    description: Optional[str]
+    allowed: tuple[str, ...] | None
+    description: str | None
 
     @classmethod
     def process(cls, m):
