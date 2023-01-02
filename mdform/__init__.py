@@ -2,11 +2,14 @@
     mdform
     ~~~~~~
 
-    An extension for `python-markdown`_ to generate parse forms in Markdown based document.
+    An extension for `python-markdown`_ to generate parse forms
+    in Markdown based document.
 
     :copyright: 2021 by mdform Authors, see AUTHORS for more details.
     :license: BSD, see LICENSE for more details.
 """
+
+from __future__ import annotations
 
 from typing import Dict, Tuple
 

@@ -6,26 +6,39 @@
     Labeled required field      <label>* =
 
     Specific fields:
-        - StringField           ___[length]         (length is optional)
-        - IntegerField          ###[min:max:step]   (min, max, step are optional)
-        - DecimalField          #.#[min:max:step:places]   (min, max, step, places are optional)
-        - FloatField            #.#f[min:max:step]   (min, max, step are optional)
-        - TextAreaField         AAA[length]         (length is optional)
+        - StringField           ___[length]
+                                (length is optional)
+        - IntegerField          ###[min:max:step]
+                                (min, max, step are optional)
+        - DecimalField          #.#[min:max:step:places]
+                                (min, max, step, places are optional)
+        - FloatField            #.#f[min:max:step]
+                                (min, max, step are optional)
+        - TextAreaField         AAA[length]
+                                (length is optional)
         - DateField             d/m/y
         - TimeField             hh:mm
         - EmailField            @
-        - RadioField            (x) A () B          (the x is optional, defines a default choice)
-        - CheckboxField         [x] A [] B          (the x is optional, defines a default choice)
-        - SelectField           {(A), B}            (the parenthesis are optional, defines a default choice)
-        - FileField             ...[allowed]        (allowed is optional, extensions; description)
+        - RadioField            (x) A () B
+                                (the x is optional, defines a default choice)
+        - CheckboxField         [x] A [] B
+                                (the x is optional, defines a default choice)
+        - SelectField           {(A), B}
+                                (the parenthesis are optional, defines a default choice)
+        - FileField             ...[allowed]
+                                (allowed is optional, extensions; description)
 
     Organization:
         - Section
-            [section:name]      name is a string which is prepended to the field names
-        - Collapsable part      control is the name of the field controlling open and close
+            [section:name]      name is a string which is prepended
+                                to the field names
+        - Collapsable part      control is the name of the field
+                                controlling open and close
             [collapse:control]      of this part.
-            [endcollapse]           - Use [o] to indicate that selecting that option should open the part
-                                    - Use [c] to indicate that selecting that option should close the part
+            [endcollapse]           - Use [o] to indicate that selecting
+                                      that option should open the part
+                                    - Use [c] to indicate that selecting
+                                      that option should close the part
 
     :copyright: 2021 by mdform Authors, see AUTHORS for more details.
     :license: BSD, see LICENSE for more details.
@@ -34,6 +47,7 @@
 from __future__ import annotations
 
 import re
+import typing
 from abc import abstractmethod
 from dataclasses import dataclass
 from typing import Any, AnyStr, Dict, Match, Optional, Pattern, Tuple
@@ -53,14 +67,14 @@ COLLAPSE_OPEN_RE = re.compile(r"\[collapse[ \t]*(:(?P<name>.*))?\]", re.UNICODE)
 COLLAPSE_CLOSE_RE = re.compile(r"\[endcollapse]")
 
 
-def _parse_or_none(el: str, typ):
+def _parse_or_none(el: str, typ: typing.Callable[[Any], Any]):
     el = el.strip()
     if el:
         return typ(el)
     return None
 
 
-def _parse_range_args(s: str, typ):
+def _parse_range_args(s: str) -> tuple[int | None, int | None, int | None]:
 
     if s is None:
         return None, None, None
@@ -70,7 +84,7 @@ def _parse_range_args(s: str, typ):
     if s is None or s == "":
         raise ValueError
 
-    s = [_parse_or_none(el, typ) for el in s.split(":")]
+    s = [_parse_or_none(el, int) for el in s.split(":")]
 
     if len(s) == 1:
         return None, s[0], None
@@ -82,17 +96,19 @@ def _parse_range_args(s: str, typ):
     raise ValueError
 
 
-def _parse_range_round_args(s: str, typ):
+def _parse_range_round_args(
+    s: str,
+) -> tuple[float | None, float | None, float | None, int]:
 
     if s is None:
-        return None, None, None, 2
+        return None, None, None, 2.0
 
     s = s.lower().strip()
 
     if s is None or s == "":
         raise ValueError
 
-    s = [_parse_or_none(el, typ) for el in s.split(":")]
+    s = [_parse_or_none(el, float) for el in s.split(":")]
 
     if len(s) == 1:
         return None, s[0], None, 2
@@ -101,7 +117,7 @@ def _parse_range_round_args(s: str, typ):
     elif len(s) == 3:
         return s[0], s[1], s[2], 2
     elif len(s) == 4:
-        return s[0], s[1], s[2], s[3]
+        return s[0], s[1], s[2], int(s[3])
 
     raise ValueError
 
@@ -116,7 +132,8 @@ class _RegexField(JSONWizard):
 
     @classmethod
     def _preprocess_pattern(cls):
-        """Overload this method in subclass to modify a regex pattern before compiling."""
+        """Overload this method in subclass to modify
+        a regex pattern before compiling."""
         return cls._PATTERN
 
     def __init_subclass__(cls, **kwargs):
@@ -129,7 +146,8 @@ class _RegexField(JSONWizard):
 class Field(_RegexField):
     """A field of any kind with label.
 
-    Used as an entry point, it match the label and then test all registered specific fields.
+    Used as an entry point, it match the label
+    and then test all registered specific fields.
 
     The format for optional fields is:
 
@@ -267,7 +285,7 @@ class IntegerField(SpecificField):
     @classmethod
     def process(cls, m):
         try:
-            mn, mx, step = _parse_range_args(m.group("range"), int)
+            mn, mx, step = _parse_range_args(m.group("range"))
         except Exception:
             return None
 

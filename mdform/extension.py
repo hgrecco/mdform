@@ -2,7 +2,8 @@
     mdform.extension
     ~~~~~~~~~~~~~~~~
 
-    An extension for `python-markdown`_ to generate parse forms in Markdown based document.
+    An extension for `python-markdown`_ to generate parse forms
+    in Markdown based document.
 
     :copyright: 2021 by mdform Authors, see AUTHORS for more details.
     :license: BSD, see LICENSE for more details.
@@ -66,7 +67,7 @@ def default_field_formatter(variable_name: str, field: Field) -> str:
     return "{{ " + f"form.{variable_name}" + " }}"
 
 
-def _value_to_name(value):
+def _value_to_name(value: str | None) -> str:
     if value is None:
         return ""
     return value.lower().strip()
@@ -158,7 +159,8 @@ class FormExtension(Extension):
             "sanitizer": [default_label_sanitizer, "Function to sanitize the label"],
             "formatter": [
                 default_field_formatter,
-                "Use format template for fields. The signature must be (str, dict)->str",
+                "Use format template for fields. "
+                "The signature must be (str, dict)->str",
             ],
         }
         super().__init__(**kwargs)
