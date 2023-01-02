@@ -74,7 +74,9 @@ def _parse_or_none(el: str, typ: typing.Callable[[Any], Any]):
     return None
 
 
-def _parse_range_args(s: str) -> tuple[int | None, int | None, int | None]:
+def _parse_range_args(
+    s: str, typ: typing.Callable[[Any], Any]
+) -> tuple[int | None, int, int | None]:
 
     if s is None:
         return None, None, None
@@ -84,7 +86,7 @@ def _parse_range_args(s: str) -> tuple[int | None, int | None, int | None]:
     if s is None or s == "":
         raise ValueError
 
-    s = [_parse_or_none(el, int) for el in s.split(":")]
+    s = [_parse_or_none(el, typ) for el in s.split(":")]
 
     if len(s) == 1:
         return None, s[0], None
@@ -101,7 +103,7 @@ def _parse_range_round_args(
 ) -> tuple[float | None, float | None, float | None, int]:
 
     if s is None:
-        return None, None, None, 2.0
+        return None, None, None, 2
 
     s = s.lower().strip()
 
@@ -285,7 +287,7 @@ class IntegerField(SpecificField):
     @classmethod
     def process(cls, m):
         try:
-            mn, mx, step = _parse_range_args(m.group("range"))
+            mn, mx, step = _parse_range_args(m.group("range"), int)
         except Exception:
             return None
 
@@ -306,7 +308,7 @@ class DecimalField(SpecificField):
     @classmethod
     def process(cls, m):
         try:
-            mn, mx, step, places = _parse_range_round_args(m.group("range"), float)
+            mn, mx, step, places = _parse_range_round_args(m.group("range"))
         except Exception:
             return None
 
