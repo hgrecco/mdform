@@ -76,7 +76,7 @@ def _parse_or_none(el: str, typ: typing.Callable[[Any], Any]):
 
 def _parse_range_args(
     s: str, typ: typing.Callable[[Any], Any]
-) -> tuple[int | None, int, int | None]:
+) -> tuple[int | None, int | None, int | None]:
 
     if s is None:
         return None, None, None

@@ -11,8 +11,6 @@
 
 from __future__ import annotations
 
-from typing import Dict, Tuple
-
 import pkg_resources
 from markdown import Markdown
 

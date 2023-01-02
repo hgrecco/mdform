@@ -14,6 +14,7 @@ from __future__ import annotations
 import re
 
 import unidecode
+from markdown import Markdown
 from markdown.extensions import Extension
 from markdown.preprocessors import Preprocessor
 
@@ -84,10 +85,10 @@ class FormPreprocessor(Preprocessor):
         form field formatter function.
     """
 
-    # dictionary mapping labels to
+    # dictionary mapping labels to fields
     mdform_definition: dict[str, Field] = {}
 
-    def __init__(self, md, sanitizer=None, formatter=default_field_formatter):
+    def __init__(self, md: Markdown, sanitizer=None, formatter=default_field_formatter):
         self.sanitizer = sanitizer or (lambda s: s)
         if formatter is None:
             formatter = default_field_formatter
@@ -153,6 +154,8 @@ class FormPreprocessor(Preprocessor):
 class FormExtension(Extension):
     """Form extension for Python-Markdown."""
 
+    md: Markdown
+
     def __init__(self, **kwargs):
         self.config = {
             "sanitizer": [default_label_sanitizer, "Function to sanitize the label"],
@@ -164,7 +167,7 @@ class FormExtension(Extension):
         }
         super().__init__(**kwargs)
 
-    def extendMarkdown(self, md):
+    def extendMarkdown(self, md: Markdown):
         md.registerExtension(self)
         self.md = md
         md.preprocessors.register(
