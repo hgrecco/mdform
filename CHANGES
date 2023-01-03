@@ -1,10 +1,12 @@
 mdform Changelog
 ================
 
-0.6 (unreleased)
+0.6 (2023-02-02)
 ----------------
 
-- Nothing changed yet.
+- Migrated project structure to use pyproject.toml.
+- Migrated typing to PEP585.
+- Python 3.8 is no longer supported.
 
 
 0.5.2 (2021-12-21)
