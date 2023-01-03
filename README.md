@@ -30,7 +30,7 @@ Do you like this = () YES () NO
 
 will generate the following html template:
 
-```jinja
+```jinja2
 Please fill this form:
 
 {{ form.name }}
@@ -100,19 +100,19 @@ email = @
 
 Each field is parsed into an object with the following attributes
 
-- original_label: `str`, label as given in the markdown
+- **original_label**: `str`, label as given in the markdown
   text.
-- required: `bool`, indicate if the `*`  was
+- **required**: `bool`, indicate if the `*`  was
   present.
-- specific_field: `object`, describing the field in more
+- **specific_field**: `object`, describing the field in more
   detail that might contain additional attributes.
 
 Additionally, it has two properties:
 
-- is_label_hidden: bool, indicates if `original_label`
+- **is_label_hidden**: bool, indicates if `original_label`
   starts with `_` which can be used downstream to
   indicate the label should not be displayed.
-- label: str, a clean version of `original_label` in which
+- **label**: str, a clean version of `original_label` in which
   `_` prefix has been removed.
 
 In the following lines, we will describe the syntax for each specific
@@ -130,7 +130,7 @@ or:
 name = ___[50]
 ```
 
-Exactly 3 underscores will be matched. Any more will be handled as
+Exactly 3 underscores will be matched. More will be handled as
 standard underline directives.
 
 Customizing:
@@ -141,7 +141,7 @@ name = ___[length]
 
 Specific field attributes:
 
-- length : int or None (default)
+- **length**: int or None (default)
 
 ### Integer fields (IntegerField)
 
@@ -168,9 +168,9 @@ The `range` is parsed like a numpy range.
 
 Specific field attributes:
 
-- min : int or None (default)
-- max : int or None (default)
-- step : int or None (default)
+- **min**: int or None (default)
+- **max**: int or None (default)
+- **step**: int or None (default)
 
 ### Float fields (FloatField)
 
@@ -184,7 +184,7 @@ or:
 value = #.#f[0:2:0.5]
 ```
 
-Exactly 3 numbers will be matched. Any more will be handled as standard
+Exactly 3 numbers will be matched. More will be handled as standard
 directives.
 
 Customizing:
@@ -197,9 +197,9 @@ The `range` is parsed like a numpy range.
 
 Specific field attributes:
 
-- min : float or None (default)
-- max : float or None (default)
-- step : float or None (default)
+- **min**: float or None (default)
+- **max**: float or None (default)
+- **step**: float or None (default)
 
 ### Decimal fields (DecimalField)
 
@@ -213,7 +213,7 @@ or:
 value = #.#[0:2:0.5:1]
 ```
 
-Exactly 4 numbers will be matched. Any more will be handled as standard
+Exactly 4 numbers will be matched. More will be handled as standard
 directives.
 
 Customizing:
@@ -227,10 +227,10 @@ position) is always the place
 
 Specific field attributes:
 
-- min : float or None (default)
-- max : float or None (default)
-- step : float or None (default)
-- step : int (default = 2)
+- **min**: float or None (default)
+- **max**: float or None (default)
+- **step**: float or None (default)
+- **step**: int (default = 2)
 
 ### Text area (TextAreaField)
 
@@ -254,7 +254,7 @@ name = ___[length]
 
 Specific field attributes:
 
-- length : int or None (default)
+- **length**: int or None (default)
 
 ### Radio buttons (RadioField)
 
@@ -267,8 +267,8 @@ value.
 
 Specific field attributes:
 
-- values : tuple of str
-- default : str
+- **values**: tuple of str
+- **default**: str
 
 ### Check boxes (CheckboxField)
 
@@ -281,8 +281,8 @@ values.
 
 Specific field attributes:
 
-- values : tuple of strings
-- default : tuple of str
+- **values**: tuple of strings
+- **default**: tuple of str
 
 ### Drop down (SelectField)
 
@@ -300,13 +300,13 @@ city = {BOS -> Boston, SFO -> San Francisco, (NYC -> New York City)}
 city = {BOS, SFO, (NYC -> New York City)}
 ```
 
-The option in parenthesis will be the default.
+The option in parentheses will be the default.
 
 Specific field attributes:
 
-- choices : tuple of (str, str) (key, value)
-- default : str
-- collapse_on: str or None Item used to collapse. Format "~value"
+- **choices**: tuple of (str, str) (key, value)
+- **default**: str
+- **collapse_on**: str or None Item used to collapse. Format "~value"
   or "value"
 
 ### File Field (FileField)
@@ -331,8 +331,8 @@ name = ...[png,jpg;Only image files]
 
 Specific field attributes:
 
-- allowed : tuple of str
-- description : str
+- **allowed**: tuple of str
+- **description**: str
 
 ### Date Field (DateField)
 
@@ -362,7 +362,7 @@ name = ___
 
 will render as:
 
-```jinja
+```jinja2
 {{ form.university_name }}
 {{ form.school_name }}
 ```
@@ -399,7 +399,7 @@ name = ___
 
 will render as:
 
-```jinja
+```jinja2
 {{ form.university_name }}
 {{ form.name }}
 ```
