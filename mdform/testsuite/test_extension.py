@@ -89,13 +89,13 @@ def test_default():
 
 
 def test_default_None():
-    md = Markdown(extensions=[FormExtension(formatter=None)])
+    md = Markdown(extensions=[FormExtension()])
     assert md.convert(TEXT) == DEFAULT_FORMATTED
     assert md.mdform_definition == FORM
 
 
 def test_dup():
-    md = Markdown(extensions=[FormExtension(formatter=None)])
+    md = Markdown(extensions=[FormExtension()])
     with pytest.raises(ValueError):
         md.convert(TEXT_DUP)
 

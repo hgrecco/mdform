@@ -50,7 +50,7 @@ import re
 import typing
 from abc import abstractmethod
 from dataclasses import dataclass
-from typing import Any, AnyStr, Match, Pattern
+from typing import Any, Match, Pattern, ClassVar, TypeVar
 
 from dataclass_wizard import JSONWizard
 
@@ -67,62 +67,100 @@ COLLAPSE_OPEN_RE = re.compile(r"\[collapse[ \t]*(:(?P<name>.*))?\]", re.UNICODE)
 COLLAPSE_CLOSE_RE = re.compile(r"\[endcollapse]")
 
 
-def _parse_or_none(el: str, typ: typing.Callable[[Any], Any]):
+T = TypeVar("T")
+
+
+def _strgroup(m: Match[str], groupname: str) -> str:
+
+    out = m.group(groupname)
+
+    if not isinstance(out, str):
+        raise Exception(f"Cannnot handle content in regex group {groupname}."
+                        f"Expected str, found {out} ({type(out)}))")
+
+    return out.strip()
+
+
+def _strgroup_none(m: Match[str], groupname: str) -> str | None:
+    
+    out = m.group(groupname)
+
+    if out is None:
+        return None
+    
+    return _strgroup(m, groupname)
+
+
+def _parse_or_none(el: str, typ: typing.Callable[[str], T]) -> T | None:
     el = el.strip()
     if el:
         return typ(el)
     return None
 
 
-def _parse_range_args(
-    s: str, typ: typing.Callable[[Any], Any]
-) -> tuple[int | None, int | None, int | None]:
+def _parse_or_raise(el: str, typ: typing.Callable[[str], T]) -> T:
+    el = el.strip()
+    if not el:
+        raise ValueError("Cannot parse an empty string.")
+    return typ(el)
 
-    if s is None:
+
+def _parse_range_args(
+    input: str | None, typ: typing.Callable[[str], T]
+) -> tuple[T | None, T | None, T | None]:
+
+    if input is None:
         return None, None, None
 
-    s = s.lower().strip()
+    s = input.lower().strip()
 
-    if s is None or s == "":
-        raise ValueError
+    if s == "":
+        raise ValueError("Could not parse range arguments from empty string.")
 
-    s = [_parse_or_none(el, typ) for el in s.split(":")]
+    parts = [_parse_or_none(el, typ) for el in s.split(":")]
 
-    if len(s) == 1:
-        return None, s[0], None
-    elif len(s) == 2:
-        return s[0], s[1], None
-    elif len(s) == 3:
-        return s[0], s[1], s[2]
+    if len(parts) == 1:
+        return None, parts[0], None
+    elif len(parts) == 2:
+        return parts[0], parts[1], None
+    elif len(parts) == 3:
+        return parts[0], parts[1], parts[2]
 
-    raise ValueError
+    raise ValueError(f"Could not parse range arguments from {input}." 
+                     f"Up to 3 values expected, {len(parts)} given.")
 
 
 def _parse_range_round_args(
-    s: str,
+    input: str | None,
+    ndigits: int=2
 ) -> tuple[float | None, float | None, float | None, int]:
 
-    if s is None:
+    if input is None:
         return None, None, None, 2
 
-    s = s.lower().strip()
+    s = input.lower().strip()
 
-    if s is None or s == "":
-        raise ValueError
+    if s == "":
+        raise ValueError("Could not parse range-round arguments from empty string.")
 
-    s = [_parse_or_none(el, float) for el in s.split(":")]
+    parts = s.split(":")
 
-    if len(s) == 1:
-        return None, s[0], None, 2
-    elif len(s) == 2:
-        return s[0], s[1], None, 2
-    elif len(s) == 3:
-        return s[0], s[1], s[2], 2
-    elif len(s) == 4:
-        return s[0], s[1], s[2], int(s[3])
+    if len(parts) > 4:
+        raise ValueError(f"Could not parse range arguments from {input}." 
+                    f"Up to 4 values expected, {len(parts)} given.")
 
-    raise ValueError
+    if len(parts) == 4:
+        ndigits = _parse_or_raise(parts[3], int)
 
+    range_parts = [_parse_or_none(el, float) for el in parts[:3]]
+
+    if len(range_parts) == 1:
+        return None, range_parts[0], None, ndigits
+    elif len(parts) == 2:
+        return range_parts[0], range_parts[1], None, ndigits
+    else:
+        return range_parts[0], range_parts[1], range_parts[2], ndigits
+    
 
 class _RegexField(JSONWizard):
 
@@ -130,7 +168,7 @@ class _RegexField(JSONWizard):
     _PATTERN: str = ""
 
     #: The compiled regex pattern to match.
-    _REGEX: Pattern
+    _REGEX: Pattern[str]
 
     @classmethod
     def _preprocess_pattern(cls):
@@ -138,7 +176,7 @@ class _RegexField(JSONWizard):
         a regex pattern before compiling."""
         return cls._PATTERN
 
-    def __init_subclass__(cls, **kwargs):
+    def __init_subclass__(cls, **kwargs: Any):
         super().__init_subclass__(**kwargs)
         if cls._PATTERN:
             cls._REGEX = re.compile(cls._preprocess_pattern(), re.UNICODE)
@@ -168,19 +206,19 @@ class Field(_RegexField):
         + EOL
     )
 
-    _FIELD_TYPES = []
+    _FIELD_TYPES: ClassVar[list[type[Field]]] = []
 
     original_label: str
     required: bool
     specific_field: SpecificField
 
     @property
-    def is_label_hidden(self):
+    def is_label_hidden(self) -> bool:
         """Return true if the label is supposed to be hidden (starts with _)"""
         return self.original_label.startswith("_")
 
     @property
-    def label(self):
+    def label(self) -> str:
         if self.is_label_hidden:
             return self.original_label[1:]
         return self.original_label
@@ -196,12 +234,12 @@ class Field(_RegexField):
             return None
 
         for ft in cls._FIELD_TYPES:
-            matched = ft.match(m.group("pending"))
+            matched = ft.match(_strgroup(m, "pending"))
 
             if matched is None:
                 continue
 
-            label = m.group("label").strip()
+            label = _strgroup(m, "label")
             required = not m.group("required") is None
 
             return label, required, ft(**matched)
@@ -224,13 +262,13 @@ class SpecificField(_RegexField):
     def _preprocess_pattern(cls):
         return "[ \t]*" + cls._PATTERN + "[ \t]*" + EOL
 
-    def __init_subclass__(cls, **kwargs):
+    def __init_subclass__(cls, **kwargs: Any):
         super().__init_subclass__(**kwargs)
         Field._FIELD_TYPES.append(cls)
 
     @classmethod
     @abstractmethod
-    def process(cls, m: Match[AnyStr] | None) -> dict[str, Any]:
+    def process(cls, m: Match[str]) -> dict[str, Any] | None:
         """Process a matched string. Usually you must subclass this
         to produce
         """
@@ -256,7 +294,6 @@ class SpecificField(_RegexField):
 
         return cls.process(m)
 
-
 @dataclass(frozen=True)
 class StringField(SpecificField):
     """Used to take single string input."""
@@ -266,7 +303,7 @@ class StringField(SpecificField):
     length: int | None
 
     @classmethod
-    def process(cls, m):
+    def process(cls, m: Match[str]) -> dict[str, Any] | None:
         length = m.group("length") or None
         if length is not None:
             length = int(length)
@@ -285,9 +322,9 @@ class IntegerField(SpecificField):
     step: int | None = None
 
     @classmethod
-    def process(cls, m):
+    def process(cls, m: Match[str]) -> dict[str, Any] | None:
         try:
-            mn, mx, step = _parse_range_args(m.group("range"), int)
+            mn, mx, step = _parse_range_args(_strgroup_none(m, "range"), int)
         except Exception:
             return None
 
@@ -306,9 +343,9 @@ class DecimalField(SpecificField):
     places: int | None = 2
 
     @classmethod
-    def process(cls, m):
+    def process(cls, m: Match[str]) -> dict[str, Any] | None:
         try:
-            mn, mx, step, places = _parse_range_round_args(m.group("range"))
+            mn, mx, step, places = _parse_range_round_args(_strgroup_none(m, "range"))
         except Exception:
             return None
 
@@ -326,9 +363,9 @@ class FloatField(SpecificField):
     step: float | None = None
 
     @classmethod
-    def process(cls, m):
+    def process(cls, m: Match[str]) -> dict[str, Any] | None:
         try:
-            mn, mx, step = _parse_range_args(m.group("range"), float)
+            mn, mx, step = _parse_range_args(_strgroup_none(m, "range"), float)
         except Exception:
             return None
 
@@ -344,7 +381,7 @@ class TextAreaField(SpecificField):
     length: int | None = None
 
     @classmethod
-    def process(cls, m):
+    def process(cls, m: Match[str]) -> dict[str, Any] | None:
         length = m.group("length") or None
         if length is not None:
             length = int(length)
@@ -362,7 +399,7 @@ class DateField(SpecificField):
     _PATTERN = r"d/m/y"
 
     @classmethod
-    def process(cls, m):
+    def process(cls, m: Match[str]) -> dict[str, Any] | None:
         return dict()
 
 
@@ -376,7 +413,7 @@ class TimeField(SpecificField):
     _PATTERN = r"hh:mm"
 
     @classmethod
-    def process(cls, m):
+    def process(cls, m: Match[str]) -> dict[str, Any] | None:
         return dict()
 
 
@@ -387,7 +424,7 @@ class EmailField(SpecificField):
     _PATTERN = r"@"
 
     @classmethod
-    def process(cls, m):
+    def process(cls, m: Match[str]) -> dict[str, Any] | None:
         return dict()
 
 
@@ -405,11 +442,11 @@ class RadioField(SpecificField):
     default: str
 
     @classmethod
-    def process(cls, m):
-        items = []
+    def process(cls, m: Match[str]) -> dict[str, Any] | None:
+        items: list[str] = []
         default = None
 
-        for matched in cls._SUB_REGEX.finditer(m.group("content")):
+        for matched in cls._SUB_REGEX.finditer(_strgroup(m, "content")):
             label = matched.group("label").strip()
 
             items.append(label)
@@ -433,16 +470,16 @@ class CheckboxField(SpecificField):
     default: str
 
     @classmethod
-    def process(cls, m):
-        items = []
-        default = []
+    def process(cls, m: Match[str]) -> dict[str, Any] | None:
+        items: list[str] = []
+        default: list[str] = []
 
-        for matched in cls._SUB_REGEX.finditer(m.group("content")):
-            label = matched.group("label").strip()
+        for matched in cls._SUB_REGEX.finditer(_strgroup(m, "content")):
+            label = _strgroup(matched, "label").strip()
 
             items.append(label)
 
-            if matched.group("is_default") == "x":
+            if _strgroup(matched, "is_default") == "x":
                 default.append(label)
 
         return dict(choices=tuple(items), default=tuple(default))
@@ -459,13 +496,13 @@ class SelectField(SpecificField):
     collapse_on: str
 
     @classmethod
-    def process(cls, m):
-        items = []
+    def process(cls, m: Match[str]) -> dict[str, Any] | None:
+        items: list[tuple[str, str]] = []
         default = None
 
         collapse_on = None
 
-        for item in m.group("content").split(","):
+        for item in _strgroup(m, "content").split(","):
             is_default = False
 
             item = item.strip()
@@ -474,7 +511,7 @@ class SelectField(SpecificField):
                 is_default = True
 
             if "->" in item:
-                pair = tuple(s.strip() for s in item.split("->"))
+                pair = tuple(s.strip() for s in item.split("->", 1))
             else:
                 pair = (item, item)
 
@@ -513,7 +550,7 @@ class FileField(SpecificField):
     description: str | None
 
     @classmethod
-    def process(cls, m):
+    def process(cls, m: Match[str]) -> dict[str, Any] | None:
         allowed = m.group("allowed") or None
         description = None
 

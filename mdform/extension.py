@@ -12,7 +12,8 @@
 from __future__ import annotations
 
 import re
-
+import typing as ty
+from typing import Any
 import unidecode
 from markdown import Markdown
 from markdown.extensions import Extension
@@ -22,6 +23,11 @@ from .fields import COLLAPSE_CLOSE_RE, COLLAPSE_OPEN_RE, SECTION_RE, Field
 
 COLLAPSE_OPEN_HTML = r'<div id="accordion-%s">'
 COLLAPSE_CLOSE_HTML = r"</div>"
+
+
+FormDefinition = dict[str, Field]
+Sanitizer = ty.Callable[[str], str]
+FieldFormatter = ty.Callable[[str, Field], str]
 
 
 def default_label_sanitizer(s: str) -> str:
@@ -38,15 +44,15 @@ def default_label_sanitizer(s: str) -> str:
         an identifier representing the variable
     """
 
-    s = unidecode.unidecode(s)
+    out: str = unidecode.unidecode(s)
 
     # Remove invalid characters
-    s = re.sub(r"[^0-9a-zA-Z_]", "_", s)
+    out = re.sub(r"[^0-9a-zA-Z_]", "_", out)
 
     # Remove leading characters until we find a letter or underscore
-    s = re.sub(r"^[^a-zA-Z_]+", "_", s)
+    out = re.sub(r"^[^a-zA-Z_]+", "_", out)
 
-    return s
+    return out
 
 
 def default_field_formatter(variable_name: str, field: Field) -> str:
@@ -81,27 +87,26 @@ class FormPreprocessor(Preprocessor):
     md
     sanitizer : callable str -> str
         label sanitizer function that will be used.
-    formatter : callable (str, dict) -> str
+    formatter : callable (str, Field) -> str
         form field formatter function.
     """
 
-    # dictionary mapping labels to fields
-    mdform_definition: dict[str, Field] = {}
-
-    def __init__(self, md: Markdown, sanitizer=None, formatter=default_field_formatter):
-        self.sanitizer = sanitizer or (lambda s: s)
-        if formatter is None:
-            formatter = default_field_formatter
-        self.formatter = formatter
+    def __init__(self,
+                 md: Markdown,
+                 sanitizer: Sanitizer = default_label_sanitizer,
+                 formatter: FieldFormatter = default_field_formatter
+                 ):
         super().__init__(md)
+        self.sanitizer = sanitizer
+        self.formatter = formatter
 
-    def run(self, lines):
+    def run(self, lines: ty.Iterable[str]) -> list[str]:
         """Parse Form and store in Markdown.Form."""
         unnamed_collapese_cnt = 0
         form = {}
         section = None
 
-        out = []
+        out: list[str] = []
         for line in lines:
             m1 = SECTION_RE.match(line)
             if m1:
@@ -136,7 +141,7 @@ class FormPreprocessor(Preprocessor):
             variable_name = self.sanitizer(field.label.lower())
 
             if section:
-                variable_name = "{}_{}".format(section, variable_name)
+                variable_name: str = "{}_{}".format(section, variable_name)
 
             if variable_name in form:
                 raise ValueError(
@@ -147,18 +152,23 @@ class FormPreprocessor(Preprocessor):
 
             out.append(self.formatter(variable_name, field))
 
-        self.md.mdform_definition = form
+        self.md.mdform_definition = form    # type: ignore
         return out
 
 
 class FormExtension(Extension):
     """Form extension for Python-Markdown."""
 
-    md: Markdown
+    # Implementation note: we do not implement reset
+    # as the only property (mdform_definition) is
+    # overwritten in each run.
 
-    def __init__(self, **kwargs):
+    def __init__(self, **kwargs: Any):
         self.config = {
-            "sanitizer": [default_label_sanitizer, "Function to sanitize the label"],
+            "sanitizer": [
+                default_label_sanitizer,
+                "Function to sanitize the label"
+            ],
             "formatter": [
                 default_field_formatter,
                 "Use format template for fields. "
@@ -168,19 +178,16 @@ class FormExtension(Extension):
         super().__init__(**kwargs)
 
     def extendMarkdown(self, md: Markdown):
-        md.registerExtension(self)
-        self.md = md
         md.preprocessors.register(
             FormPreprocessor(
-                md, self.getConfig("sanitizer"), self.getConfig("formatter")
+                md,
+                self.getConfig("sanitizer"),
+                self.getConfig("formatter")
             ),
             "form",
             30,
         )
 
-    def reset(self):
-        self.md.mdform_definition = {}
 
-
-def makeExtension(**kwargs):
+def makeExtension(**kwargs: Any):
     return FormExtension(**kwargs)  # pragma: no cover
