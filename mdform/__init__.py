@@ -14,7 +14,13 @@ from __future__ import annotations
 import pkg_resources
 from markdown import Markdown
 
-from .extension import FormExtension, Sanitizer, FormDefinition, FieldFormatter, default_field_formatter
+from .extension import (
+    FormExtension,
+    Sanitizer,
+    FormDefinition,
+    FieldFormatter,
+    default_field_formatter,
+)
 from .fields import Field
 
 try:  # pragma: no cover
@@ -25,12 +31,22 @@ except Exception:  # pragma: no cover
     __version__ = "unknown"
 
 
-def parse(text: str, formatter: FieldFormatter = default_field_formatter) -> tuple[str, FormDefinition]:
+def parse(
+    text: str, formatter: FieldFormatter = default_field_formatter
+) -> tuple[str, FormDefinition]:
     md = Markdown(extensions=[FormExtension(formatter=formatter)])
     html = md.convert(text)
-    form_def : FormDefinition = md.mdform_definition # type: ignore
+    form_def: FormDefinition = md.mdform_definition  # type: ignore
     return html, form_def
 
 
-__all__ = ("FormExtension", "__version__", "Markdown", "parse", "Field",
-           "Sanitizer", "FormDefinition", "FormDefinition")
+__all__ = (
+    "FormExtension",
+    "__version__",
+    "Markdown",
+    "parse",
+    "Field",
+    "Sanitizer",
+    "FormDefinition",
+    "FormDefinition",
+)

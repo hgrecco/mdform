@@ -91,11 +91,12 @@ class FormPreprocessor(Preprocessor):
         form field formatter function.
     """
 
-    def __init__(self,
-                 md: Markdown,
-                 sanitizer: Sanitizer = default_label_sanitizer,
-                 formatter: FieldFormatter = default_field_formatter
-                 ):
+    def __init__(
+        self,
+        md: Markdown,
+        sanitizer: Sanitizer = default_label_sanitizer,
+        formatter: FieldFormatter = default_field_formatter,
+    ):
         super().__init__(md)
         self.sanitizer = sanitizer
         self.formatter = formatter
@@ -152,7 +153,7 @@ class FormPreprocessor(Preprocessor):
 
             out.append(self.formatter(variable_name, field))
 
-        self.md.mdform_definition = form    # type: ignore
+        self.md.mdform_definition = form  # type: ignore
         return out
 
 
@@ -165,10 +166,7 @@ class FormExtension(Extension):
 
     def __init__(self, **kwargs: Any):
         self.config = {
-            "sanitizer": [
-                default_label_sanitizer,
-                "Function to sanitize the label"
-            ],
+            "sanitizer": [default_label_sanitizer, "Function to sanitize the label"],
             "formatter": [
                 default_field_formatter,
                 "Use format template for fields. "
@@ -180,9 +178,7 @@ class FormExtension(Extension):
     def extendMarkdown(self, md: Markdown):
         md.preprocessors.register(
             FormPreprocessor(
-                md,
-                self.getConfig("sanitizer"),
-                self.getConfig("formatter")
+                md, self.getConfig("sanitizer"), self.getConfig("formatter")
             ),
             "form",
             30,

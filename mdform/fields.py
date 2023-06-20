@@ -71,23 +71,23 @@ T = TypeVar("T")
 
 
 def _strgroup(m: Match[str], groupname: str) -> str:
-
     out = m.group(groupname)
 
     if not isinstance(out, str):
-        raise Exception(f"Cannnot handle content in regex group {groupname}."
-                        f"Expected str, found {out} ({type(out)}))")
+        raise Exception(
+            f"Cannnot handle content in regex group {groupname}."
+            f"Expected str, found {out} ({type(out)}))"
+        )
 
     return out.strip()
 
 
 def _strgroup_none(m: Match[str], groupname: str) -> str | None:
-    
     out = m.group(groupname)
 
     if out is None:
         return None
-    
+
     return _strgroup(m, groupname)
 
 
@@ -108,7 +108,6 @@ def _parse_or_raise(el: str, typ: typing.Callable[[str], T]) -> T:
 def _parse_range_args(
     input: str | None, typ: typing.Callable[[str], T]
 ) -> tuple[T | None, T | None, T | None]:
-
     if input is None:
         return None, None, None
 
@@ -126,15 +125,15 @@ def _parse_range_args(
     elif len(parts) == 3:
         return parts[0], parts[1], parts[2]
 
-    raise ValueError(f"Could not parse range arguments from {input}." 
-                     f"Up to 3 values expected, {len(parts)} given.")
+    raise ValueError(
+        f"Could not parse range arguments from {input}."
+        f"Up to 3 values expected, {len(parts)} given."
+    )
 
 
 def _parse_range_round_args(
-    input: str | None,
-    ndigits: int=2
+    input: str | None, ndigits: int = 2
 ) -> tuple[float | None, float | None, float | None, int]:
-
     if input is None:
         return None, None, None, 2
 
@@ -146,8 +145,10 @@ def _parse_range_round_args(
     parts = s.split(":")
 
     if len(parts) > 4:
-        raise ValueError(f"Could not parse range arguments from {input}." 
-                    f"Up to 4 values expected, {len(parts)} given.")
+        raise ValueError(
+            f"Could not parse range arguments from {input}."
+            f"Up to 4 values expected, {len(parts)} given."
+        )
 
     if len(parts) == 4:
         ndigits = _parse_or_raise(parts[3], int)
@@ -160,10 +161,9 @@ def _parse_range_round_args(
         return range_parts[0], range_parts[1], None, ndigits
     else:
         return range_parts[0], range_parts[1], range_parts[2], ndigits
-    
+
 
 class _RegexField(JSONWizard):
-
     #: The regex pattern to match
     _PATTERN: str = ""
 
@@ -240,7 +240,7 @@ class Field(_RegexField):
                 continue
 
             label = _strgroup(m, "label")
-            required = not m.group("required") is None
+            required = m.group("required") is not None
 
             return label, required, ft(**matched)
 
@@ -293,6 +293,7 @@ class SpecificField(_RegexField):
             return None
 
         return cls.process(m)
+
 
 @dataclass(frozen=True)
 class StringField(SpecificField):
