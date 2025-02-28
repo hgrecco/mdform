@@ -23,12 +23,15 @@ requires-python = ">=3.11"
 keywords = ["markdown", "form"]
 dependencies = ["markdown>=3.0.1", "unidecode", "dataclass_wizard"]
 
-[tool.hatch.build]
-packages = ["mdform"]
-
 [project.urls]
 Homepage = "https://github.com/hgrecco/mdform"
 Issues = "https://github.com/hgrecco/mdform/issues"
+
+[project.entry-points."markdown.extensions"]
+form = "mdform:FormExtension"
+
+[tool.hatch.build]
+packages = ["mdform"]
 
 [build-system]
 requires = ["hatchling", "hatch-vcs"]
@@ -53,9 +56,6 @@ extend-select = ["I"]
 [tool.pixi.project]
 channels = ["https://fast.prefix.dev/conda-forge"]
 platforms = ["osx-arm64", "linux-64"]
-
-[option.entry_points."markdown.extensions"]
-form = "mdform:FormExtension"
 
 [tool.pixi.environments]
 lint = { features = ["lint"], no-default-feature = true }

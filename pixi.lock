@@ -926,8 +926,8 @@ packages:
   timestamp: 1733250550053
 - pypi: .
   name: mdform
-  version: 0.7.dev4+g0c888d6.d20250228
-  sha256: 45cbe5effac458f3775af16280241f0dad336218b2953df3fd29838182f5468c
+  version: 0.7.dev7+gb98bcc8.d20250228
+  sha256: b0d5102128034a9619ceed6805be0f751e9ca1a2550f17e631b0eee4acc9cc38
   requires_dist:
   - dataclass-wizard
   - markdown>=3.0.1
