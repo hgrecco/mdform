@@ -124,7 +124,7 @@ class FormPreprocessor(Preprocessor):
                     control_field = str(unnamed_collapese_cnt)
                     unnamed_collapese_cnt += 1
                 if section:
-                    control_field = "{}_{}".format(section, control_field)
+                    control_field = f"{section}_{control_field}"
 
                 out.append(COLLAPSE_OPEN_HTML % control_field)
                 continue
@@ -143,7 +143,7 @@ class FormPreprocessor(Preprocessor):
             variable_name = self.sanitizer(field.label.lower())
 
             if section:
-                variable_name: str = "{}_{}".format(section, variable_name)
+                variable_name: str = f"{section}_{variable_name}"
 
             if variable_name in form:
                 raise ValueError(

@@ -50,7 +50,8 @@ import re
 import typing
 from abc import abstractmethod
 from dataclasses import dataclass
-from typing import Any, ClassVar, Match, Pattern, TypeVar
+from re import Match, Pattern
+from typing import Any, ClassVar, TypeVar
 
 from dataclass_wizard import JSONWizard
 
