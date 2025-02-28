@@ -1,4 +1,4 @@
-import pytest
+import pytest  # type: ignore
 
 from mdform import FormExtension, Markdown, fields, parse
 
@@ -85,13 +85,13 @@ FORM = {
 def test_default():
     md = Markdown(extensions=[FormExtension()])
     assert md.convert(TEXT) == DEFAULT_FORMATTED
-    assert md.mdform_definition == FORM
+    assert md.mdform_definition == FORM  # type: ignore
 
 
 def test_default_None():
     md = Markdown(extensions=[FormExtension()])
     assert md.convert(TEXT) == DEFAULT_FORMATTED
-    assert md.mdform_definition == FORM
+    assert md.mdform_definition == FORM  # type: ignore
 
 
 def test_dup():

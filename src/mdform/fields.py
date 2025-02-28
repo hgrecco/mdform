@@ -206,7 +206,7 @@ class Field(_RegexField):
         + EOL
     )
 
-    _FIELD_TYPES: ClassVar[list[type[Field]]] = []
+    _FIELD_TYPES: ClassVar[list[type[SpecificField]]] = []
 
     original_label: str
     required: bool
@@ -513,7 +513,7 @@ class SelectField(SpecificField):
                 is_default = True
 
             if "->" in item:
-                pair = tuple(s.strip() for s in item.split("->", 1))
+                pair: tuple[str, str] = tuple(s.strip() for s in item.split("->", 1))  # type: ignore
             else:
                 pair = (item, item)
 

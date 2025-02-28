@@ -63,7 +63,7 @@ channels = ["https://fast.prefix.dev/conda-forge"]
 platforms = ["osx-arm64", "linux-64"]
 
 [tool.pixi.environments]
-lint = { features = ["lint"], no-default-feature = true }
+lint = { features = ["lint", "test"], no-default-feature = true }
 build = { features = ["build"], no-default-feature = true }
 test = { features = ["test"], solve-group = "default" }
 test-py311 = ["test", "py311"]
