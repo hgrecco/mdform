@@ -53,8 +53,6 @@ from dataclasses import dataclass
 from re import Match, Pattern
 from typing import Any, ClassVar, TypeVar
 
-from dataclass_wizard import JSONWizard
-
 #: End of s with spaces or tabs before.
 EOL = r"[ \t]?$"
 
@@ -164,12 +162,13 @@ def _parse_range_round_args(
         return range_parts[0], range_parts[1], range_parts[2], ndigits
 
 
-class _RegexField(JSONWizard):
-    #: The regex pattern to match
-    _PATTERN: str = ""
-
+@dataclass(frozen=True)
+class _RegexField:
     #: The compiled regex pattern to match.
-    _REGEX: Pattern[str]
+    _REGEX: ClassVar[Pattern[str]]
+
+    #: The regex pattern to match
+    _PATTERN: ClassVar[str] = ""
 
     @classmethod
     def _preprocess_pattern(cls):
@@ -256,6 +255,7 @@ class Field(_RegexField):
         raise ValueError("Could not match labeled field")
 
 
+@dataclass(frozen=True)
 class SpecificField(_RegexField):
     """Base class for all specific fields."""
 
@@ -493,7 +493,7 @@ class SelectField(SpecificField):
 
     _PATTERN = r"\{(?P<content>([\w \t\->_,\(\)\[\]]+))\}"
 
-    choices: tuple[str, ...]
+    choices: tuple[tuple[str, str], ...]
     default: str
     collapse_on: str
 

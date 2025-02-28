@@ -21,7 +21,7 @@ classifiers = [
 ]
 requires-python = ">=3.11"
 keywords = ["markdown", "form"]
-dependencies = ["markdown>=3.0.1", "unidecode", "dataclass_wizard"]
+dependencies = ["markdown>=3.0.1", "unidecode"]
 
 [project.urls]
 Homepage = "https://github.com/hgrecco/mdform"
