@@ -1,47 +1,47 @@
 """
-    mdform.fields
-    ~~~~~~~~~~~~~
+mdform.fields
+~~~~~~~~~~~~~
 
-    Labeled field               <label> =
-    Labeled required field      <label>* =
+Labeled field               <label> =
+Labeled required field      <label>* =
 
-    Specific fields:
-        - StringField           ___[length]
-                                (length is optional)
-        - IntegerField          ###[min:max:step]
-                                (min, max, step are optional)
-        - DecimalField          #.#[min:max:step:places]
-                                (min, max, step, places are optional)
-        - FloatField            #.#f[min:max:step]
-                                (min, max, step are optional)
-        - TextAreaField         AAA[length]
-                                (length is optional)
-        - DateField             d/m/y
-        - TimeField             hh:mm
-        - EmailField            @
-        - RadioField            (x) A () B
-                                (the x is optional, defines a default choice)
-        - CheckboxField         [x] A [] B
-                                (the x is optional, defines a default choice)
-        - SelectField           {(A), B}
-                                (the parenthesis are optional, defines a default choice)
-        - FileField             ...[allowed]
-                                (allowed is optional, extensions; description)
+Specific fields:
+    - StringField           ___[length]
+                            (length is optional)
+    - IntegerField          ###[min:max:step]
+                            (min, max, step are optional)
+    - DecimalField          #.#[min:max:step:places]
+                            (min, max, step, places are optional)
+    - FloatField            #.#f[min:max:step]
+                            (min, max, step are optional)
+    - TextAreaField         AAA[length]
+                            (length is optional)
+    - DateField             d/m/y
+    - TimeField             hh:mm
+    - EmailField            @
+    - RadioField            (x) A () B
+                            (the x is optional, defines a default choice)
+    - CheckboxField         [x] A [] B
+                            (the x is optional, defines a default choice)
+    - SelectField           {(A), B}
+                            (the parenthesis are optional, defines a default choice)
+    - FileField             ...[allowed]
+                            (allowed is optional, extensions; description)
 
-    Organization:
-        - Section
-            [section:name]      name is a string which is prepended
-                                to the field names
-        - Collapsable part      control is the name of the field
-                                controlling open and close
-            [collapse:control]      of this part.
-            [endcollapse]           - Use [o] to indicate that selecting
-                                      that option should open the part
-                                    - Use [c] to indicate that selecting
-                                      that option should close the part
+Organization:
+    - Section
+        [section:name]      name is a string which is prepended
+                            to the field names
+    - Collapsable part      control is the name of the field
+                            controlling open and close
+        [collapse:control]      of this part.
+        [endcollapse]           - Use [o] to indicate that selecting
+                                  that option should open the part
+                                - Use [c] to indicate that selecting
+                                  that option should close the part
 
-    :copyright: 2023 by mdform Authors, see AUTHORS for more details.
-    :license: BSD, see LICENSE for more details.
+:copyright: 2023 by mdform Authors, see AUTHORS for more details.
+:license: BSD, see LICENSE for more details.
 """
 
 from __future__ import annotations
@@ -50,7 +50,7 @@ import re
 import typing
 from abc import abstractmethod
 from dataclasses import dataclass
-from typing import Any, Match, Pattern, ClassVar, TypeVar
+from typing import Any, ClassVar, Match, Pattern, TypeVar
 
 from dataclass_wizard import JSONWizard
 

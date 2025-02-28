@@ -1,3 +1,0 @@
-markdown>=3.0.1
-unidecode
-dataclass_wizard

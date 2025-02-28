@@ -1,14 +1,8 @@
-[![Latest Version](https://img.shields.io/pypi/v/mdform.svg)](https://pypi.python.org/pypi/mdform)
-
-[![License](https://img.shields.io/pypi/l/mdform.svg)](https://pypi.python.org/pypi/mdform)
-
-[![Python Versions](https://img.shields.io/pypi/pyversions/mdform.svg)](https://pypi.python.org/pypi/mdform)
-
-[![CI](https://github.com/hgrecco/mdform/workflows/CI/badge.svg)](https://github.com/hgrecco/mdform/actions?query=workflow%3ACI)
-
-[![LINTER](https://github.com/hgrecco/mdform/workflows/Lint/badge.svg)](https://github.com/hgrecco/mdform/actions?query=workflow%3ALint)
-
-[![Coverage](https://coveralls.io/repos/github/hgrecco/mdform/badge.svg?branch=master)](https://coveralls.io/github/hgrecco/mdform?branch=master)
+![PyVersion](https://img.shields.io/pypi/pyversions/mdform?label=python)
+![Package](https://img.shields.io/pypi/v/mdform?label=PyPI)
+![License](https://img.shields.io/pypi/l/mdform?label=license)
+[![CI](https://github.com/hgrecco/mdform/actions/workflows/ci.yml/badge.svg)](https://github.com/hgrecco/mdform/actions/workflows/ci.yml)
+[![pre-commit.ci status](https://results.pre-commit.ci/badge/github/hgrecco/mdform/main.svg)](https://results.pre-commit.ci/latest/github/hgrecco/mdform/main)
 
 # mdform
 
@@ -70,6 +64,7 @@ pip install mdform
 
 ```python
 >>> import mdform
+>>> text = "name* = ___"
 >>> html, form_definition = mdform.parse(text)
 ```
 
@@ -102,7 +97,7 @@ Each field is parsed into an object with the following attributes
 
 - **original_label**: `str`, label as given in the markdown
   text.
-- **required**: `bool`, indicate if the `*`  was
+- **required**: `bool`, indicate if the `*` was
   present.
 - **specific_field**: `object`, describing the field in more
   detail that might contain additional attributes.
@@ -369,7 +364,7 @@ will render as:
 
 and the form definition dictionary:
 
-```python
+```json
 {
     "university_name": Field(
         original_label="name", required=True, specific_field=StringField(length=None)
@@ -474,7 +469,7 @@ parameter. For example, if you want to generate a
 
 ```python
 >>> def mako_field_formatter(variable_name, field):
-        return "${ " + f"form.{variable_name}" + " }"
+...     return "${ " + f"form.{variable_name}" + " }"
 >>>
 >>> import mdform
 >>> html, form_definition = mdform.parse(text, formatter=mako_field_formatter)

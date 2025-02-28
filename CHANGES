@@ -4,7 +4,8 @@ mdform Changelog
 0.7 (unreleased)
 ----------------
 
-- Nothing has changed yet.
+- Migted project structure and build to pixi.
+- Minor Python version is 3.11
 
 
 0.6 (2023-02-02)

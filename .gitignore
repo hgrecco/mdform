@@ -1,24 +1,17 @@
-*~
-__pycache__
-*egg-info*
-*.pyc
-.DS_Store
-docs/_build/
-.idea
-.vscode
+# hidden
+.*
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Distribution / packaging
 build/
 dist/
-MANIFEST
-*pytest_cache*
-.eggs
+*.egg*
 
-# WebDAV file system cache files
-.DAV/
+# pixi environments
+.pixi
 
-# tags files (from ctags)
-tags
-
-.coverage*
-
-# notebook stuff
-*.ipynb_checkpoints*
+test_readme.txt
