@@ -53,6 +53,11 @@ docstring-code-format = true
 [tool.ruff.lint]
 extend-select = ["I"]
 
+[tool.pyright]
+typeCheckingMode = "standard"
+venv = "default"
+venvPath = ".pixi/envs/"
+
 [tool.pixi.project]
 channels = ["https://fast.prefix.dev/conda-forge"]
 platforms = ["osx-arm64", "linux-64"]
@@ -72,10 +77,12 @@ taplo = "*"
 ruff = "*"
 mdformat = "*"
 mdformat-ruff = "*"
+pyright = "*"
 
 [tool.pixi.feature.lint.tasks]
 pre-commit-install = "pre-commit install"
 lint = "pre-commit run"
+typecheck = "pyright"
 
 [tool.pixi.feature.build.dependencies]
 uv = "*"
